@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Insumos Corporativo | MVP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Login Styles */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Layout Styles */
+        #wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: #ecf0f1;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: var(--secondary-color);
+            border-bottom: 1px solid #465c71;
+        }
+
+        #sidebar ul.components {
+            padding: 20px 0;
+        }
+
+        #sidebar ul li a {
+            padding: 12px 20px;
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        #sidebar ul li a:hover, #sidebar ul li a.active {
+            color: #fff;
+            background: var(--secondary-color);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        #content {
+            width: calc(100% - var(--sidebar-width));
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        /* Components */
+        .card-metric {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .card-metric:hover { transform: translateY(-3px); }
+        
+        .status-active { color: #27ae60; font-weight: bold; }
+        .status-inactive { color: #c0392b; font-weight: bold; }
+        
+        .stock-low { background-color: #ffe6e6; }
+        
+        .badge-role { font-size: 0.8em; padding: 5px 8px; border-radius: 4px; }
+        .bg-super { background-color: #8e44ad; color: white; }
+        .bg-admin { background-color: #2980b9; color: white; }
+        .bg-user { background-color: #95a5a6; color: white; }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .table-responsive { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold text-secondary">Insumos SaaS</h3>
+                <p class="text-muted">Gestión Corporativa Inteligente</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Usuario (Email Demo)</label>
+                    <select class="form-select" id="loginEmail">
+                        <option value="admin@corp.com">Super Admin (Corporativo)</option>
+                        <option value="admin@tech.com">Admin Empresa (Tech Solutions)</option>
+                        <option value="user@tech.com">Usuario Empresa (Tech Solutions)</option>
+                        <option value="admin@logis.com">Admin Empresa (Logística Global)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" value="1234" disabled>
+                    <small class="text-muted">Contraseña demo prellenada</small>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">Ingresar al Sistema</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="wrapper" class="hidden">
+        <nav id="sidebar">
+            <div class="sidebar-header d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="mb-0">SaaS Corp</h5>
+                    <small id="userDisplayRole" class="text-info" style="font-size: 0.75rem;"></small>
+                </div>
+                <i class="bi bi-building"></i>
+            </div>
+
+            <ul class="list-unstyled components" id="sidebarMenu">
+                </ul>
+
+            <div class="mt-auto p-3 border-top border-secondary">
+                <small class="d-block text-muted mb-1">Usuario:</small>
+                <strong id="userDisplayName" class="d-block mb-3">Nombre Usuario</strong>
+                <button onclick="app.logout()" class="btn btn-outline-light btn-sm w-100">
+                    <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
+                </button>
+            </div>
+        </nav>
+
+        <div id="content">
+            <nav class="navbar navbar-light bg-light d-md-none mb-4 rounded">
+                <div class="container-fluid">
+                    <button type="button" class="btn btn-primary btn-sm">Menu</button>
+                    <span class="navbar-brand mb-0 h1">SaaS Insumos</span>
+                </div>
+            </nav>
+
+            <div id="mainContainer">
+                </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalInsumo" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gestionar Insumo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formInsumo">
+                        <input type="hidden" id="insumoId">
+                        <div class="mb-2">
+                            <label>Nombre</label>
+                            <input type="text" id="insumoNombre" class="form-control" required>
+                        </div>
+                        <div class="mb-2">
+                            <label>SKU / Código</label>
+                            <input type="text" id="insumoSku" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-2">
+                                <label>Stock Inicial</label>
+                                <input type="number" id="insumoStock" class="form-control" required>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <label>Stock Mínimo (Alerta)</label>
+                                <input type="number" id="insumoMin" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalMovimiento" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Entrada/Salida</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formMovimiento">
+                        <input type="hidden" id="movInsumoId">
+                        <h6 id="movInsumoNombre" class="mb-3 text-primary"></h6>
+                        <div class="mb-3">
+                            <label>Tipo de Movimiento</label>
+                            <select id="movTipo" class="form-select">
+                                <option value="IN">Entrada (Compra/Devolución)</option>
+                                <option value="OUT">Salida (Consumo/Venta)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Cantidad</label>
+                            <input type="number" id="movCantidad" class="form-control" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Nota / Razón</label>
+                            <input type="text" id="movNota" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Registrar Movimiento</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        /**
+         * SISTEMA SAAS MULTI-TENANT (MVP)
+         * Arquitectura: Datos en LocalStorage, Lógica en JS puro.
+         */
+
+        // --- 1. BASE DE DATOS SIMULADA ---
+        const DB_KEYS = {
+            USERS: 'saas_users',
+            COMPANIES: 'saas_companies',
+            INVENTORY: 'saas_inventory',
+            MOVEMENTS: 'saas_movements',
+            AUDIT: 'saas_audit',
+            PAYMENTS: 'saas_payments'
+        };
+
+        const initialData = {
+            users: [
+                { id: 1, name: 'Super Admin', email: 'admin@corp.com', role: 'super_admin', companyId: null },
+                { id: 2, name: 'Gerente Tech', email: 'admin@tech.com', role: 'company_admin', companyId: 1 },
+                { id: 3, name: 'Operario Tech', email: 'user@tech.com', role: 'company_user', companyId: 1 },
+                { id: 4, name: 'Gerente Logis', email: 'admin@logis.com', role: 'company_admin', companyId: 2 }
+            ],
+            companies: [
+                { id: 1, name: 'Tech Solutions Inc.', plan: 'Enterprise', status: 'active', created: '2023-01-15' },
+                { id: 2, name: 'Logística Global S.A.', plan: 'Basic', status: 'active', created: '2023-02-20' },
+                { id: 3, name: 'StartUp Fail', plan: 'Free', status: 'inactive', created: '2023-05-10' }
+            ],
+            inventory: [
+                { id: 101, companyId: 1, name: 'Laptop Dell XPS', sku: 'DELL-001', stock: 15, minStock: 5 },
+                { id: 102, companyId: 1, name: 'Monitor LG 24"', sku: 'LG-24', stock: 3, minStock: 10 }, // Stock bajo
+                { id: 103, companyId: 2, name: 'Cajas Cartón Grande', sku: 'BOX-L', stock: 500, minStock: 100 }
+            ],
+            movements: [
+                { id: 1, itemId: 101, companyId: 1, type: 'IN', qty: 15, date: '2023-10-01', user: 'Gerente Tech', note: 'Compra inicial' }
+            ],
+            payments: [
+                { id: 1, companyId: 1, amount: 299.00, date: '2023-10-01', status: 'Pagado', plan: 'Enterprise' },
+                { id: 2, companyId: 2, amount: 49.00, date: '2023-10-05', status: 'Pagado', plan: 'Basic' }
+            ],
+            audit: [
+                { id: 1, action: 'SYSTEM_INIT', detail: 'Sistema inicializado', user: 'System', date: new Date().toLocaleString() }
+            ]
+        };
+
+        // --- 2. GESTOR DE DATOS (DAL) ---
+        const DataManager = {
+            init() {
+                if (!localStorage.getItem(DB_KEYS.USERS)) {
+                    localStorage.setItem(DB_KEYS.USERS, JSON.stringify(initialData.users));
+                    localStorage.setItem(DB_KEYS.COMPANIES, JSON.stringify(initialData.companies));
+                    localStorage.setItem(DB_KEYS.INVENTORY, JSON.stringify(initialData.inventory));
+                    localStorage.setItem(DB_KEYS.MOVEMENTS, JSON.stringify(initialData.movements));
+                    localStorage.setItem(DB_KEYS.PAYMENTS, JSON.stringify(initialData.payments));
+                    localStorage.setItem(DB_KEYS.AUDIT, JSON.stringify(initialData.audit));
+                }
+            },
+            get(key) { return JSON.parse(localStorage.getItem(key) || '[]'); },
+            set(key, data) { localStorage.setItem(key, JSON.stringify(data)); },
+            add(key, item) {
+                const data = this.get(key);
+                item.id = Date.now(); // Simple ID generation
+                data.push(item);
+                this.set(key, data);
+                return item;
+            },
+            logAudit(action, detail, user) {
+                const logs = this.get(DB_KEYS.AUDIT);
+                logs.unshift({ // Add to beginning
+                    id: Date.now(),
+                    action,
+                    detail,
+                    user,
+                    date: new Date().toLocaleString()
+                });
+                this.set(DB_KEYS.AUDIT, logs);
+            }
+        };
+
+        // --- 3. LÓGICA DE APLICACIÓN ---
+        const app = {
+            currentUser: null,
+            currentView: 'dashboard',
+
+            init() {
+                DataManager.init();
+                this.bindLogin();
+                
+                // Verificar sesión existente
+                const session = sessionStorage.getItem('saas_session');
+                if (session) {
+                    this.currentUser = JSON.parse(session);
+                    this.loadApp();
+                }
+            },
+
+            bindLogin() {
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('loginEmail').value;
+                    const users = DataManager.get(DB_KEYS.USERS);
+                    const user = users.find(u => u.email === email);
+
+                    if (user) {
+                        this.currentUser = user;
+                        sessionStorage.setItem('saas_session', JSON.stringify(user));
+                        DataManager.logAudit('LOGIN', `Acceso al sistema`, user.email);
+                        this.loadApp();
+                    } else {
+                        alert('Usuario no encontrado');
+                    }
+                });
+            },
+
+            logout() {
+                DataManager.logAudit('LOGOUT', `Cierre de sesión`, this.currentUser.email);
+                sessionStorage.removeItem('saas_session');
+                this.currentUser = null;
+                document.getElementById('wrapper').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+            },
+
+            loadApp() {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('wrapper').classList.remove('hidden');
+                
+                document.getElementById('userDisplayName').textContent = this.currentUser.name;
+                document.getElementById('userDisplayRole').textContent = this.getRoleName(this.currentUser.role);
+
+                this.renderSidebar();
+                
+                // Redirección inicial según rol
+                if (this.currentUser.role === 'super_admin') {
+                    this.router('corp_dashboard');
+                } else {
+                    this.router('empresa_dashboard');
+                }
+            },
+
+            getRoleName(role) {
+                const roles = {
+                    'super_admin': 'Super Admin Corporativo',
+                    'company_admin': 'Administrador Empresa',
+                    'company_user': 'Usuario Operativo'
+                };
+                return roles[role] || role;
+            },
+
+            renderSidebar() {
+                const menu = document.getElementById('sidebarMenu');
+                menu.innerHTML = '';
+
+                const addItem = (id, label, icon) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a onclick="app.router('${id}')"><i class="bi bi-${icon} me-2"></i>${label}</a>`;
+                    menu.appendChild(li);
+                };
+
+                if (this.currentUser.role === 'super_admin') {
+                    addItem('corp_dashboard', 'Dashboard Global', 'speedometer2');
+                    addItem('corp_companies', 'Empresas', 'buildings');
+                    addItem('corp_users', 'Usuarios Globales', 'people');
+                    addItem('corp_payments', 'Pagos', 'credit-card');
+                    addItem('corp_audit', 'Auditoría', 'shield-lock');
+                } else {
+                    addItem('empresa_dashboard', 'Mi Empresa', 'speedometer');
+                    addItem('empresa_inventory', 'Insumos', 'box-seam');
+                    addItem('empresa_movements', 'Movimientos', 'arrow-left-right');
+                    if (this.currentUser.role === 'company_admin') {
+                        addItem('empresa_reports', 'Reportes', 'file-earmark-bar-graph');
+                    }
+                }
+            },
+
+            router(viewId) {
+                const container = document.getElementById('mainContainer');
+                container.innerHTML = ''; // Limpiar vista actual
+                
+                // Actualizar active en sidebar
+                document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active'));
+                
+                // Renderizar vista
+                switch(viewId) {
+                    case 'corp_dashboard': this.views.corpDashboard(container); break;
+                    case 'corp_companies': this.views.corpCompanies(container); break;
+                    case 'corp_users': this.views.corpUsers(container); break;
+                    case 'corp_payments': this.views.corpPayments(container); break;
+                    case 'corp_audit': this.views.corpAudit(container); break;
+                    
+                    case 'empresa_dashboard': this.views.empresaDashboard(container); break;
+                    case 'empresa_inventory': this.views.empresaInventory(container); break;
+                    case 'empresa_movements': this.views.empresaMovements(container); break;
+                    case 'empresa_reports': this.views.empresaReports(container); break;
+                }
+            },
+
+            // --- VISTAS ---
+            views: {
+                // SUPER ADMIN VIEWS
+                corpDashboard(container) {
+                    const companies = DataManager.get(DB_KEYS.COMPANIES);
+                    const users = DataManager.get(DB_KEYS.USERS);
+                    const payments = DataManager.get(DB_KEYS.PAYMENTS);
+                    
+                    const activeComp = companies.filter(c => c.status === 'active').length;
+                    const totalRev = payments.reduce((sum, p) => sum + p.amount, 0);
+
+                    container.innerHTML = `
+                        <h2 class="mb-4">Panel Corporativo</h2>
+                        <div class="row g-4">
+                            <div class="col-md-3">
+                                <div class="card p-3 card-metric border-start border-4 border-primary">
+                                    <h3 class="fw-bold">${activeComp}</h3>
+                                    <span class="text-muted">Empresas Activas</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card p-3 card-metric border-start border-4 border-success">
+                                    <h3 class="fw-bold">$${totalRev.toFixed(2)}</h3>
+                                    <span class="text-muted">Ingresos Totales</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card p-3 card-metric border-start border-4 border-info">
+                                    <h3 class="fw-bold">${users.length}</h3>
+                                    <span class="text-muted">Usuarios Totales</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-5">
+                            <h4>Últimas Transacciones</h4>
+                            ${app.components.table(payments.slice(0,5), ['Empresa ID', 'Monto', 'Plan', 'Fecha'], ['companyId', 'amount', 'plan', 'date'])}
+                        </div>
+                    `;
+                },
+
+                corpCompanies(container) {
+                    const companies = DataManager.get(DB_KEYS.COMPANIES);
+                    
+                    let html = `
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2>Gestión de Empresas</h2>
+                            <button class="btn btn-primary" onclick="alert('Función crear empresa (Demo)')"><i class="bi bi-plus-lg"></i> Nueva Empresa</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead><tr><th>Nombre</th><th>Plan</th><th>Estado</th><th>Fecha Alta</th><th>Acciones</th></tr></thead>
+                                <tbody>
+                                    ${companies.map(c => `
+                                        <tr>
+                                            <td>${c.name}</td>
+                                            <td><span class="badge bg-secondary">${c.plan}</span></td>
+                                            <td><span class="${c.status === 'active' ? 'status-active' : 'status-inactive'}">${c.status}</span></td>
+                                            <td>${c.created}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="alert('Editar ${c.name}')"><i class="bi bi-pencil"></i></button>
+                                                ${c.status === 'active' ? 
+                                                    `<button class="btn btn-sm btn-outline-danger" onclick="app.actions.toggleCompany(${c.id}, 'inactive')">Desactivar</button>` : 
+                                                    `<button class="btn btn-sm btn-outline-success" onclick="app.actions.toggleCompany(${c.id}, 'active')">Activar</button>`
+                                                }
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    container.innerHTML = html;
+                },
+
+                corpUsers(container) {
+                    const users = DataManager.get(DB_KEYS.USERS);
+                    const companies = DataManager.get(DB_KEYS.COMPANIES);
+                    
+                    // Helper para nombre empresa
+                    const getCompName = (id) => {
+                        if(!id) return 'N/A';
+                        const c = companies.find(x => x.id === id);
+                        return c ? c.name : 'Desconocida';
+                    };
+
+                    container.innerHTML = `
+                        <h2 class="mb-4">Usuarios Globales</h2>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Empresa Asignada</th></tr></thead>
+                                <tbody>
+                                    ${users.map(u => `
+                                        <tr>
+                                            <td>${u.name}</td>
+                                            <td>${u.email}</td>
+                                            <td><span class="badge-role ${u.role === 'super_admin' ? 'bg-super' : (u.role === 'company_admin' ? 'bg-admin' : 'bg-user')}">${u.role}</span></td>
+                                            <td>${getCompName(u.companyId)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                },
+
+                corpAudit(container) {
+                    const logs = DataManager.get(DB_KEYS.AUDIT);
+                    container.innerHTML = `
+                        <h2 class="mb-4">Bitácora de Auditoría</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm">
+                                <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead>
+                                <tbody>
+                                    ${logs.map(l => `
+                                        <tr>
+                                            <td>${l.date}</td>
+                                            <td>${l.user}</td>
+                                            <td><strong>${l.action}</strong></td>
+                                            <td>${l.detail}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                },
+
+                corpPayments(container) {
+                    const payments = DataManager.get(DB_KEYS.PAYMENTS);
+                    const companies = DataManager.get(DB_KEYS.COMPANIES);
+                    const getCompName = (id) => companies.find(x => x.id === id)?.name || 'N/A';
+
+                    container.innerHTML = `
+                        <h2 class="mb-4">Registro de Pagos</h2>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead><tr><th>Fecha</th><th>Empresa</th><th>Plan</th><th>Monto</th><th>Estado</th></tr></thead>
+                                <tbody>
+                                    ${payments.map(p => `
+                                        <tr>
+                                            <td>${p.date}</td>
+                                            <td>${getCompName(p.companyId)}</td>
+                                            <td>${p.plan}</td>
+                                            <td>$${p.amount.toFixed(2)}</td>
+                                            <td><span class="badge bg-success">${p.status}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                },
+
+                // EMPRESA VIEWS
+                empresaDashboard(container) {
+                    const cid = app.currentUser.companyId;
+                    const inventory = DataManager.get(DB_KEYS.INVENTORY).filter(i => i.companyId === cid);
+                    const movements = DataManager.get(DB_KEYS.MOVEMENTS).filter(m => m.companyId === cid);
+                    
+                    const totalItems = inventory.reduce((sum, i) => sum + i.stock, 0);
+                    const lowStock = inventory.filter(i => i.stock <= i.minStock).length;
+                    const lastMoves = movements.sort((a,b) => b.id - a.id).slice(0, 5);
+
+                    container.innerHTML = `
+                        <h2 class="mb-4">Dashboard Operativo</h2>
+                        
+                        ${lowStock > 0 ? `
+                        <div class="alert alert-danger d-flex align-items-center mb-4">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>Tienes <strong>${lowStock}</strong> productos con stock bajo o crítico.</div>
+                        </div>` : ''}
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="card p-4 card-metric border-top border-4 border-primary">
+                                    <h4>${totalItems}</h4>
+                                    <span class="text-muted">Unidades en Stock</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card p-4 card-metric border-top border-4 border-warning">
+                                    <h4>${inventory.length}</h4>
+                                    <span class="text-muted">SKUs Diferentes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header bg-white fw-bold">Últimos Movimientos</div>
+                            <div class="card-body p-0">
+                                <table class="table table-striped mb-0">
+                                    <thead><tr><th>Item</th><th>Tipo</th><th>Cant.</th><th>Usuario</th><th>Fecha</th></tr></thead>
+                                    <tbody>
+                                        ${lastMoves.map(m => {
+                                            const item = inventory.find(i => i.id === m.itemId);
+                                            return `
+                                            <tr>
+                                                <td>${item ? item.name : 'Borrado'}</td>
+                                                <td><span class="badge ${m.type === 'IN' ? 'bg-success' : 'bg-danger'}">${m.type}</span></td>
+                                                <td>${m.qty}</td>
+                                                <td>${m.user}</td>
+                                                <td>${m.date}</td>
+                                            </tr>`;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                },
+
+                empresaInventory(container) {
+                    const cid = app.currentUser.companyId;
+                    const inventory = DataManager.get(DB_KEYS.INVENTORY).filter(i => i.companyId === cid);
+                    const isAdmin = app.currentUser.role === 'company_admin';
+
+                    container.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2>Inventario</h2>
+                            ${isAdmin ? `<button class="btn btn-primary" onclick="app.actions.openInsumoModal()"><i class="bi bi-plus-lg"></i> Nuevo Insumo</button>` : ''}
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead><tr><th>SKU</th><th>Nombre</th><th>Stock</th><th>Min</th><th>Estado</th><th>Acciones</th></tr></thead>
+                                <tbody>
+                                    ${inventory.map(i => `
+                                        <tr class="${i.stock <= i.minStock ? 'stock-low' : ''}">
+                                            <td>${i.sku}</td>
+                                            <td>${i.name}</td>
+                                            <td><strong>${i.stock}</strong></td>
+                                            <td>${i.minStock}</td>
+                                            <td>${i.stock <= i.minStock ? '<span class="badge bg-danger">Bajo</span>' : '<span class="badge bg-success">OK</span>'}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-dark" onclick="app.actions.openMovimientoModal(${i.id}, '${i.name}')" title="Movimiento"><i class="bi bi-arrow-left-right"></i></button>
+                                                ${isAdmin ? `<button class="btn btn-sm btn-outline-danger ms-1" onclick="app.actions.deleteInsumo(${i.id})" title="Eliminar"><i class="bi bi-trash"></i></button>` : ''}
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                },
+
+                empresaMovements(container) {
+                    const cid = app.currentUser.companyId;
+                    const inventory = DataManager.get(DB_KEYS.INVENTORY); // Need global to find names
+                    const movements = DataManager.get(DB_KEYS.MOVEMENTS).filter(m => m.companyId === cid).reverse();
+
+                    container.innerHTML = `
+                        <h2 class="mb-4">Historial de Movimientos</h2>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead><tr><th>Fecha</th><th>Insumo</th><th>Tipo</th><th>Cantidad</th><th>Usuario</th><th>Nota</th></tr></thead>
+                                <tbody>
+                                    ${movements.map(m => {
+                                        const item = inventory.find(i => i.id === m.itemId);
+                                        return `
+                                        <tr>
+                                            <td>${m.date}</td>
+                                            <td>${item ? item.name : 'Insumo Eliminado'}</td>
+                                            <td><span class="badge ${m.type === 'IN' ? 'bg-success' : 'bg-danger'}">${m.type}</span></td>
+                                            <td>${m.qty}</td>
+                                            <td>${m.user}</td>
+                                            <td>${m.note}</td>
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                },
+
+                empresaReports(container) {
+                    const cid = app.currentUser.companyId;
+                    const movements = DataManager.get(DB_KEYS.MOVEMENTS).filter(m => m.companyId === cid);
+                    const inventory = DataManager.get(DB_KEYS.INVENTORY);
+
+                    // Preparar datos para reporte
+                    const reportData = movements.map(m => {
+                        const item = inventory.find(i => i.id === m.itemId);
+                        return {
+                            Fecha: m.date,
+                            Insumo: item ? item.name : 'N/A',
+                            SKU: item ? item.sku : 'N/A',
+                            Tipo: m.type,
+                            Cantidad: m.qty,
+                            Usuario: m.user,
+                            Nota: m.note
+                        };
+                    });
+
+                    container.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2>Reportes</h2>
+                            <button class="btn btn-success" onclick='app.actions.exportCSV(${JSON.stringify(reportData)}, "reporte_movimientos")'>
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Exportar CSV
+                            </button>
+                        </div>
+                        <div class="card p-4">
+                            <h5>Movimientos Totales: ${movements.length}</h5>
+                            <p class="text-muted">Genera un archivo CSV con todo el historial de movimientos de tu empresa para análisis en Excel.</p>
+                        </div>
+                    `;
+                }
+            },
+
+            // --- COMPONENTES UI REUTILIZABLES ---
+            components: {
+                table(data, headers, keys) {
+                    if(!data.length) return '<p class="text-muted">Sin datos.</p>';
+                    return `
+                        <table class="table">
+                            <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                            <tbody>
+                                ${data.map(row => `<tr>${keys.map(k => `<td>${row[k]}</td>`).join('')}</tr>`).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+            },
+
+            // --- ACCIONES (LOGICA DE NEGOCIO) ---
+            actions: {
+                toggleCompany(id, status) {
+                    const companies = DataManager.get(DB_KEYS.COMPANIES);
+                    const idx = companies.findIndex(c => c.id === id);
+                    if(idx !== -1) {
+                        companies[idx].status = status;
+                        DataManager.set(DB_KEYS.COMPANIES, companies);
+                        DataManager.logAudit('COMPANY_UPDATE', `Empresa ${id} cambio a ${status}`, app.currentUser.email);
+                        app.router('corp_companies');
+                    }
+                },
+
+                openInsumoModal() {
+                    const modal = new bootstrap.Modal(document.getElementById('modalInsumo'));
+                    document.getElementById('formInsumo').reset();
+                    document.getElementById('formInsumo').onsubmit = (e) => {
+                        e.preventDefault();
+                        const newInsumo = {
+                            companyId: app.currentUser.companyId,
+                            name: document.getElementById('insumoNombre').value,
+                            sku: document.getElementById('insumoSku').value,
+                            stock: parseInt(document.getElementById('insumoStock').value),
+                            minStock: parseInt(document.getElementById('insumoMin').value)
+                        };
+                        DataManager.add(DB_KEYS.INVENTORY, newInsumo);
+                        DataManager.logAudit('INSUMO_ADD', `Agregado ${newInsumo.name}`, app.currentUser.email);
+                        modal.hide();
+                        app.router('empresa_inventory');
+                    };
+                    modal.show();
+                },
+
+                deleteInsumo(id) {
+                    if(confirm('¿Eliminar insumo?')) {
+                        let inventory = DataManager.get(DB_KEYS.INVENTORY);
+                        inventory = inventory.filter(i => i.id !== id);
+                        DataManager.set(DB_KEYS.INVENTORY, inventory);
+                        DataManager.logAudit('INSUMO_DEL', `Eliminado ID ${id}`, app.currentUser.email);
+                        app.router('empresa_inventory');
+                    }
+                },
+
+                openMovimientoModal(id, name) {
+                    const modal = new bootstrap.Modal(document.getElementById('modalMovimiento'));
+                    document.getElementById('formMovimiento').reset();
+                    document.getElementById('movInsumoId').value = id;
+                    document.getElementById('movInsumoNombre').textContent = `Insumo: ${name}`;
+                    
+                    document.getElementById('formMovimiento').onsubmit = (e) => {
+                        e.preventDefault();
+                        const qty = parseInt(document.getElementById('movCantidad').value);
+                        const type = document.getElementById('movTipo').value;
+                        const note = document.getElementById('movNota').value;
+                        const itemId = parseInt(document.getElementById('movInsumoId').value);
+
+                        // Actualizar Stock
+                        const inventory = DataManager.get(DB_KEYS.INVENTORY);
+                        const itemIdx = inventory.findIndex(i => i.id === itemId);
+                        
+                        if(type === 'OUT' && inventory[itemIdx].stock < qty) {
+                            alert('Stock insuficiente');
+                            return;
+                        }
+
+                        if(type === 'IN') inventory[itemIdx].stock += qty;
+                        else inventory[itemIdx].stock -= qty;
+
+                        DataManager.set(DB_KEYS.INVENTORY, inventory);
+
+                        // Registrar Movimiento
+                        DataManager.add(DB_KEYS.MOVEMENTS, {
+                            itemId,
+                            companyId: app.currentUser.companyId,
+                            type,
+                            qty,
+                            date: new Date().toISOString().split('T')[0],
+                            user: app.currentUser.name,
+                            note
+                        });
+
+                        DataManager.logAudit('STOCK_MOVE', `${type} ${qty} en item ${itemId}`, app.currentUser.email);
+                        modal.hide();
+                        // Refrescar vista actual
+                        if(document.querySelector('h2').textContent.includes('Inventario')) app.router('empresa_inventory');
+                        else app.router('empresa_dashboard');
+                    };
+                    modal.show();
+                },
+
+                exportCSV(data, filename) {
+                    if(!data || !data.length) { alert('No hay datos para exportar'); return; }
+                    
+                    const headers = Object.keys(data[0]);
+                    const csvRows = [];
+                    csvRows.push(headers.join(','));
+
+                    for(const row of data) {
+                        const values = headers.map(header => {
+                            const escaped = ('' + row[header]).replace(/"/g, '\\"');
+                            return `"${escaped}"`;
+                        });
+                        csvRows.push(values.join(','));
+                    }
+
+                    const csvData = csvRows.join('\n');
+                    const blob = new Blob([csvData], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.setAttribute('hidden', '');
+                    a.setAttribute('href', url);
+                    a.setAttribute('download', filename + '.csv');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            }
+        };
+
+        // Iniciar aplicación
+        document.addEventListener('DOMContentLoaded', () => app.init());
+
+    </script>
+</body>
+</html>
