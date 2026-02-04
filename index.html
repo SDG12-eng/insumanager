@@ -3,84 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaaS Corp | Gestión de Insumos</title>
+    <title>ArchiveMaster - Control de Insumos B2B</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="manifest" href="manifest.json">
-    <style>
-        body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
-        .login-card { border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: none; }
-        .btn-pwa { display: none; }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container d-flex flex-column justify-content-center align-items-center vh-100">
-        <div class="card login-card p-4" style="max-width: 400px; width: 100%;">
-            <div class="text-center mb-4">
-                <h2 class="fw-bold text-primary"><i class="bi bi-box-seam"></i> SaaS Corp</h2>
-                <p class="text-muted">Gestión Corporativa Inteligente</p>
+
+    <div id="landing-screen">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-bold text-primary" href="#"><i class="bi bi-box-seam-fill"></i> ArchiveMaster</a>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm" onclick="showLoginModal()">Login</button>
+                    <button class="btn btn-primary btn-sm fw-bold" onclick="startDemo()">Probá la Demo (14 Días)</button>
+                </div>
             </div>
-            
-            <form id="loginForm">
-                <div class="mb-3">
-                    <label class="form-label">Email Corporativo</label>
-                    <input type="email" id="email" class="form-control" required placeholder="nombre@empresa.com">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Contraseña</label>
-                    <input type="password" id="password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 mb-3">Iniciar Sesión</button>
-            </form>
+        </nav>
 
-            <button id="googleBtn" class="btn btn-outline-danger w-100">
-                <i class="bi bi-google me-2"></i> Acceder con Google
-            </button>
+        <header class="hero-section text-center d-flex align-items-center">
+            <div class="container">
+                <h1 class="display-4 fw-bold mb-3">Deja de perder dinero en insumos "desaparecidos"</h1>
+                <p class="lead mb-4 mx-auto" style="max-width: 700px;">
+                    Toma el control total hoy. Nuestro sistema es tu auditor interno 24/7. Centraliza la gestión, automatiza el reabastecimiento y asigna responsabilidades claras.
+                </p>
+                <button class="btn btn-light btn-lg text-primary fw-bold px-5" onclick="startDemo()">Iniciar Prueba Gratuita</button>
+                <p class="mt-2 small opacity-75">*Sin tarjeta de crédito requerida</p>
+            </div>
+        </header>
 
-            <div class="mt-4 text-center">
-                <button id="installApp" class="btn btn-sm btn-dark btn-pwa">
-                    <i class="bi bi-download me-1"></i> Instalar App
-                </button>
+        <section class="py-5 bg-light" id="pricing">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">Planes diseñados para escalar</h2>
+                    <p class="text-muted">Elige la potencia que tu operación necesita</p>
+                </div>
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 shadow-sm pricing-card">
+                            <div class="card-body text-center p-4">
+                                <h5 class="fw-bold text-secondary">Básico</h5>
+                                <h2 class="fw-bold my-3">$29 <small class="fs-6 text-muted">/mes</small></h2>
+                                <p class="text-muted small">Para startups y oficinas pequeñas.</p>
+                                <hr>
+                                <ul class="list-unstyled small text-start">
+                                    <li class="mb-2"><i class="bi bi-check2 text-primary"></i> 3 Usuarios</li>
+                                    <li class="mb-2"><i class="bi bi-check2 text-primary"></i> Gestión Ilimitada</li>
+                                    <li class="mb-2"><i class="bi bi-check2 text-primary"></i> Historial 30 días</li>
+                                </ul>
+                                <button class="btn btn-outline-dark w-100 mt-3">Elegir Básico</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 border-primary shadow pricing-card position-relative">
+                            <span class="badge bg-primary position-absolute top-0 start-50 translate-middle">RECOMENDADO</span>
+                            <div class="card-body text-center p-4">
+                                <h5 class="fw-bold text-primary">Pro</h5>
+                                <h2 class="fw-bold my-3">$79 <small class="fs-6 text-muted">/mes</small></h2>
+                                <p class="text-muted small">El estándar para PYMES eficientes.</p>
+                                <hr>
+                                <ul class="list-unstyled small text-start">
+                                    <li class="mb-2"><i class="bi bi-check2-circle text-primary"></i> <strong>10 Usuarios</strong></li>
+                                    <li class="mb-2"><i class="bi bi-check2-circle text-primary"></i> Reportes Avanzados</li>
+                                    <li class="mb-2"><i class="bi bi-check2-circle text-primary"></i> Alertas de Stock</li>
+                                    <li class="mb-2"><i class="bi bi-check2-circle text-primary"></i> Exportación Excel</li>
+                                </ul>
+                                <button class="btn btn-primary w-100 mt-3">Prueba Gratis 14 Días</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 shadow-sm pricing-card">
+                            <div class="card-body text-center p-4">
+                                <h5 class="fw-bold text-dark">Business</h5>
+                                <h2 class="fw-bold my-3">$149 <small class="fs-6 text-muted">/mes</small></h2>
+                                <p class="text-muted small">Control granular y auditoría.</p>
+                                <hr>
+                                <ul class="list-unstyled small text-start">
+                                    <li class="mb-2"><i class="bi bi-check2 text-primary"></i> 25 Usuarios</li>
+                                    <li class="mb-2"><i class="bi bi-check2 text-primary"></i> Multi-Sucursal</li>
+                                    <li class="mb-2"><i class="bi bi-check2 text-primary"></i> Logs de Auditoría</li>
+                                    <li class="mb-2"><i class="bi bi-check2 text-primary"></i> Roles Personalizados</li>
+                                </ul>
+                                <button class="btn btn-outline-dark w-100 mt-3">Elegir Business</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 shadow-sm pricing-card bg-dark text-white">
+                            <div class="card-body text-center p-4">
+                                <h5 class="fw-bold">Enterprise</h5>
+                                <h2 class="fw-bold my-3">Custom</h2>
+                                <p class="text-white-50 small">Potencia total y seguridad máxima.</p>
+                                <hr class="border-secondary">
+                                <ul class="list-unstyled small text-start">
+                                    <li class="mb-2"><i class="bi bi-check2 text-warning"></i> Usuarios Ilimitados</li>
+                                    <li class="mb-2"><i class="bi bi-check2 text-warning"></i> API Integration</li>
+                                    <li class="mb-2"><i class="bi bi-check2 text-warning"></i> SSO Corporativo</li>
+                                    <li class="mb-2"><i class="bi bi-check2 text-warning"></i> Servidores Dedicados</li>
+                                </ul>
+                                <button class="btn btn-light w-100 mt-3">Contactar Ventas</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5">
+            <div class="container">
+                <h3 class="fw-bold text-center mb-4">Preguntas Frecuentes</h3>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h6 class="fw-bold">¿Mis datos están seguros?</h6>
+                        <p class="small text-muted">Absolutamente. Utilizamos encriptación SSL de 256-bits y backups diarios.</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h6 class="fw-bold">¿Puedo cancelar cuando quiera?</h6>
+                        <p class="small text-muted">Sí, sin contratos forzosos. Cancelas desde tu panel y el servicio sigue hasta fin de mes.</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h6 class="fw-bold">¿Qué pasa si necesito más usuarios?</h6>
+                        <p class="small text-muted">Puedes comprar packs de usuarios extra o subir de plan pagando solo la diferencia.</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h6 class="fw-bold">¿Ofrecen soporte de migración?</h6>
+                        <p class="small text-muted">Sí, en planes Business y Enterprise te ayudamos a importar tus Excel iniciales.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-dark text-white text-center py-3">
+            <small>&copy; 2026 ArchiveMaster SaaS. Todos los derechos reservados.</small>
+        </footer>
+    </div>
+
+    <div id="app-screen" class="d-none">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" href="#"><i class="bi bi-box-seam-fill"></i> ArchiveMaster <span class="badge bg-warning text-dark ms-2" id="demo-badge" style="font-size:0.6rem; display:none;">MODO DEMO</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navMain">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item d-none" id="nav-dashboard"><a class="nav-link pointer" onclick="showSection('dashboard')"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                        <li class="nav-item d-none" id="nav-registrar"><a class="nav-link pointer" onclick="showSection('nuevo-registro')"><i class="bi bi-plus-circle"></i> Registrar</a></li>
+                        <li class="nav-item d-none" id="nav-misregistros"><a class="nav-link pointer" onclick="showSection('mis-registros')"><i class="bi bi-list-check"></i> Mis Registros</a></li>
+                        <li class="nav-item d-none" id="nav-admin"><a class="nav-link text-warning pointer fw-bold" onclick="showSection('panel-admin')"><i class="bi bi-gear-fill"></i> Admin</a></li>
+                        <li class="nav-item d-none" id="nav-historial"><a class="nav-link text-warning pointer" onclick="showSection('historial-maestro')"><i class="bi bi-database"></i> Historial</a></li>
+                    </ul>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-white text-end lh-1"><div id="user-display" class="fw-bold">User</div><small id="group-display" class="text-white-50">Grp</small></div>
+                        <button class="btn btn-danger btn-sm" onclick="logout()"><i class="bi bi-power"></i></button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mt-4 pb-5">
+            <div id="dashboard" class="content-section">
+                <div id="demo-alert" class="alert alert-warning d-none text-center">
+                    <strong>¡Estás en tu periodo de prueba!</strong> Te quedan <span id="days-left">14</span> días. <a href="#" class="alert-link">Suscribirse ahora al Plan Pro</a>.
+                </div>
+                <div class="row g-3 mb-4 text-center">
+                    <div class="col-md-4"><div class="card p-3 shadow-sm border-start border-4 border-primary"><h2 id="dash-total">0</h2><small>Total Registros</small></div></div>
+                    <div class="col-md-4"><div class="card p-3 shadow-sm border-start border-4 border-success"><h2 id="dash-forms">0</h2><small>Formularios</small></div></div>
+                    <div class="col-md-4"><div class="card p-3 shadow-sm border-start border-4 border-info"><h2 id="dash-users">0</h2><small>Usuarios Activos</small></div></div>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6"><div class="card shadow-sm p-3 h-100"><h6 class="fw-bold text-muted small">TENDENCIA</h6><div style="height:200px"><canvas id="chartTimeline"></canvas></div></div></div>
+                    <div class="col-md-6"><div class="card shadow-sm p-3 h-100"><h6 class="fw-bold text-muted small">USUARIOS</h6><div style="height:200px"><canvas id="chartUsers"></canvas></div></div></div>
+                </div>
+            </div>
+
+            <div id="panel-admin" class="content-section d-none">
+                <div class="row g-4">
+                    <div class="col-lg-7">
+                        <div class="card shadow-sm border-0 h-100 p-3">
+                            <h5 class="text-primary fw-bold">Configuración del Sistema</h5>
+                            <div class="input-group mb-3"><input type="text" id="group-name-input" class="form-control" placeholder="Nuevo Grupo"><button class="btn btn-dark" onclick="saveGroup()">Crear Grupo</button></div>
+                            <div class="bg-light p-3 rounded border mb-3">
+                                <input type="hidden" id="edit-template-id">
+                                <input type="text" id="type-name" class="form-control mb-2" placeholder="Nombre Formulario">
+                                <select id="type-group-select" class="form-select mb-3 group-dropdown-source"></select>
+                                <div class="text-end mb-2"><button class="btn btn-sm btn-outline-primary" onclick="addBuilderField()">+ Campo</button></div>
+                                <div id="admin-fields-builder" class="d-flex flex-column gap-2"></div>
+                            </div>
+                            <button class="btn btn-primary w-100 mb-4" id="btn-save-template" onclick="saveTemplate()">PUBLICAR FORMULARIO</button>
+                            <div id="templates-list" class="list-group scroll-area"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="card shadow-sm border-0 mb-4 p-3">
+                            <h5 class="text-primary fw-bold">Usuarios y Permisos</h5>
+                            <form id="create-user-form">
+                                <input type="hidden" id="edit-user-id">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-6"><input type="text" id="new-username" class="form-control" placeholder="User" required></div>
+                                    <div class="col-6"><select id="new-role" class="form-select"><option value="user">Usuario</option><option value="admin">Admin</option></select></div>
+                                </div>
+                                <input type="email" id="new-email" class="form-control mb-2" placeholder="Email">
+                                <input type="password" id="new-password" class="form-control mb-2" placeholder="Contraseña">
+                                <div class="mb-2"><select id="new-user-group-select" class="form-select group-dropdown-source" required></select></div>
+                                
+                                <div class="mb-3 border p-2 rounded bg-light">
+                                    <label class="small fw-bold d-block">Accesos:</label>
+                                    <input class="perm-check" type="checkbox" id="perm-dashboard"> Dash
+                                    <input class="perm-check" type="checkbox" id="perm-registrar"> Reg
+                                    <input class="perm-check" type="checkbox" id="perm-misregistros"> MisReg
+                                    <input class="perm-check" type="checkbox" id="perm-admin"> Adm
+                                    <input class="perm-check" type="checkbox" id="perm-historial"> Hist
+                                </div>
+                                <div class="d-flex gap-2"><button type="submit" class="btn btn-primary w-100" id="btn-user-submit">Guardar</button><button type="button" class="btn btn-secondary d-none" id="btn-cancel-edit" onclick="cancelEditUser()">Cancelar</button></div>
+                            </form>
+                            <hr><ul id="users-list" class="list-group scroll-area" style="max-height:200px"></ul>
+                        </div>
+
+                        <div class="card shadow-sm border-0 p-3 bg-light">
+                            <h5 class="fw-bold text-success"><i class="bi bi-credit-card"></i> Gestión de Pagos</h5>
+                            <div class="alert alert-info py-2 small">Estado de suscripción: <strong id="sub-status">Activa (Pro)</strong></div>
+                            <ul class="list-group small">
+                                <li class="list-group-item d-flex justify-content-between"><span>01/02/2026</span> <span>$79.00 USD</span> <span class="badge bg-success">Pagado</span></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>01/01/2026</span> <span>$79.00 USD</span> <span class="badge bg-success">Pagado</span></li>
+                            </ul>
+                            <button class="btn btn-outline-dark btn-sm w-100 mt-2">Ver Facturas</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="nuevo-registro" class="content-section d-none">
+                <div class="card shadow border-0 mx-auto" style="max-width: 800px;">
+                    <div class="card-body">
+                        <select id="reg-template-select" class="form-select mb-4" onchange="renderDynamicFields()"></select>
+                        <form id="dynamic-upload-form">
+                            <div id="dynamic-fields-container" class="row g-3"></div>
+                            <div class="mt-4"><input type="file" id="reg-file" class="form-control"></div>
+                            <button type="submit" class="btn btn-success w-100 mt-4 py-2 fw-bold">GUARDAR</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div id="mis-registros" class="content-section d-none">
+                <div class="card shadow-sm border-0"><div class="table-responsive"><table class="table table-hover mb-0"><thead class="table-light"><tr><th>Fecha</th><th>Formulario</th><th>Detalles</th></tr></thead><tbody id="user-history-body"></tbody></table></div></div>
+            </div>
+            <div id="historial-maestro" class="content-section d-none">
+                <div class="card shadow-sm border-0"><div class="card-header bg-warning d-flex justify-content-between"><span>Historial</span><button class="btn btn-sm btn-dark" onclick="downloadData()">CSV</button></div><div class="table-responsive"><table class="table table-striped table-hover mb-0"><thead class="table-dark"><tr><th>Fecha</th><th>Usuario</th><th>Formulario</th><th>Detalles</th><th>Acciones</th></tr></thead><tbody id="historial-table-body"></tbody></table></div></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0"><h5 class="modal-title fw-bold">Acceso Clientes</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form id="login-form">
+                        <input type="text" id="login-user" class="form-control mb-2" placeholder="Usuario / Email" required>
+                        <input type="password" id="login-pass" class="form-control mb-3" placeholder="Contraseña" required>
+                        <button class="btn btn-primary w-100 fw-bold">INGRESAR</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { loginUser, loginWithGoogle } from './auth.js';
+    <div class="modal fade" id="detailsModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Detalles</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="modal-details-body"></div></div></div></div>
 
-        // PWA Installer
-        let deferredPrompt;
-        const installBtn = document.getElementById('installApp');
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'inline-block';
-        });
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.style.display = 'none';
-                deferredPrompt = null;
-            }
-        });
-
-        // Register SW
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js');
-        }
-
-        // Login Logic
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            try {
-                await loginUser(document.getElementById('email').value, document.getElementById('password').value);
-            } catch (error) { alert("Error: " + error.message); }
-        });
-
-        document.getElementById('googleBtn').addEventListener('click', async () => {
-            try { await loginWithGoogle(); } catch (error) { alert("Error Google: " + error.message); }
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
