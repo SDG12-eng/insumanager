@@ -1,28 +1,28 @@
 import { db, firebaseConfig } from './firebase.js';
 import { collection, addDoc, getDocs, doc, updateDoc, setDoc, query, where, serverTimestamp, orderBy, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-// Importaciones extra para crear usuarios sin desloguear al admin
+// Importaciones para crear usuario secundario
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// --- SUPER ADMIN: Gestión de Empresas ---
+// --- SUPER ADMIN: GESTIÓN DE EMPRESAS ---
 
 export async function createCompany(data) {
-    // 1. Crear el usuario en Authentication usando una App Secundaria
-    // (Esto evita que se cierre la sesión del Super Admin al crear otro usuario)
+    // 1. Usar una App Secundaria para crear el usuario en Auth sin cerrar sesión al Admin
     const secondaryApp = initializeApp(firebaseConfig, "Secondary");
     const secondaryAuth = getAuth(secondaryApp);
     
     let adminUid = null;
 
     try {
+        // Crear usuario real en Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(secondaryAuth, data.adminEmail, data.password);
         adminUid = userCredential.user.uid;
         
-        // Cierra la sesión de la app secundaria inmediatamente para limpiar memoria
+        // Cerrar sesión de la app secundaria inmediatamente
         await signOut(secondaryAuth);
     } catch (error) {
-        console.error("Error creando usuario Auth:", error);
-        throw new Error("No se pudo registrar el usuario: " + error.message);
+        console.error("Error Auth:", error);
+        throw new Error("Error al crear usuario: " + error.message);
     }
 
     // 2. Crear documento de la empresa en Firestore
@@ -33,18 +33,24 @@ export async function createCompany(data) {
         createdAt: serverTimestamp()
     });
 
-    // 3. Crear el documento del usuario Admin vinculado a esa empresa
+    // 3. Crear perfil del usuario Admin en Firestore vinculado a la empresa
     if (adminUid) {
         await setDoc(doc(db, "users", adminUid), {
             email: data.adminEmail,
-            role: 'COMPANY_ADMIN', // Rol de administrador de empresa
+            role: 'COMPANY_ADMIN', // Rol Admin de Empresa
             companyId: compRef.id,
             name: "Admin " + data.name,
-            passwordHint: data.password // Opcional: Guardar la contraseña visible solo para el SuperAdmin (Riesgo de seguridad, pero útil en MVPs)
+            // Opcional: guardamos la pass solo como referencia para el Super Admin
+            passwordHint: data.password 
         });
     }
     
     return compRef.id;
+}
+
+export async function getCompanies() {
+    const snap = await getDocs(collection(db, "companies"));
+    return snap.docs.map(d => ({id: d.id, ...d.data()}));
 }
 
 export async function toggleCompanyStatus(companyId, currentStatus) {
@@ -53,12 +59,7 @@ export async function toggleCompanyStatus(companyId, currentStatus) {
     return newStatus;
 }
 
-export async function getCompanies() {
-    const snap = await getDocs(collection(db, "companies"));
-    return snap.docs.map(d => ({id: d.id, ...d.data()}));
-}
-
-// --- SUPER ADMIN: Gestión Interna ---
+// --- SUPER ADMIN: GESTIÓN INTERNA ---
 
 export async function getUsersByCompany(companyId) {
     const q = query(collection(db, "users"), where("companyId", "==", companyId));
@@ -89,7 +90,6 @@ export async function getCompanyPayments(companyId) {
 }
 
 export async function getCompanyStats(companyId) {
-    // Nota: getCountFromServer es más eficiente para contar muchos documentos
     try {
         const suppliesSnap = await getCountFromServer(query(collection(db, `companies/${companyId}/supplies`)));
         const usersSnap = await getCountFromServer(query(collection(db, "users"), where("companyId", "==", companyId)));
@@ -104,9 +104,10 @@ export async function getCompanyStats(companyId) {
     }
 }
 
-// --- EMPRESA: Insumos ---
+// --- EMPRESA: INSUMOS ---
 
 export async function getSupplies(companyId) {
+    if(!companyId) return [];
     const q = query(collection(db, `companies/${companyId}/supplies`));
     const snap = await getDocs(q);
     return snap.docs.map(d => d.data());
