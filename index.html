@@ -1,123 +1,74 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soluciones SaaS</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css"> </head>
-<body>
-
-    <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="#">
-                <i class="bi bi-box-seam-fill"></i> ArchiveMaster
-            </a>
-            <div class="d-flex gap-2">
-                <button class="btn btn-primary rounded-pill px-4 shadow-sm" onclick="abrirModalLogin()">
-                    Acceder
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <section class="hero-section text-center d-flex align-items-center" style="min-height: 80vh; padding-top: 80px;">
-        <div class="container">
-            <h1 class="display-4 fw-bold mb-3">Control Total de tus Insumos</h1>
-            <p class="lead mb-4 mx-auto" style="max-width: 700px;">
-                Plataforma SaaS multi-empresa. Gestiona inventarios, usuarios y reportes en tiempo real.
-            </p>
-            <div class="d-flex justify-content-center gap-3">
-                <button class="btn btn-outline-primary btn-lg rounded-pill" onclick="iniciarDemo()">Ver Demo</button>
-                <button class="btn btn-primary btn-lg rounded-pill" onclick="abrirModalLogin()">Iniciar Sesión</button>
-            </div>
-        </div>
-    </section>
-
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header border-0 pb-0">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-5 pt-2 text-center">
-                    <h3 class="fw-bold mb-2">Bienvenido</h3>
-                    <p class="text-muted mb-4">Ingresa a tu panel corporativo</p>
-
-                    <button id="btnGoogleLogin" class="btn btn-light border w-100 mb-3 py-2 d-flex align-items-center justify-content-center gap-2 fw-bold">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20">
-                        Iniciar sesión con Google
-                    </button>
-
-                    <div class="d-flex align-items-center mb-4">
-                        <hr class="flex-grow-1">
-                        <span class="px-3 text-muted small">O con email</span>
-                        <hr class="flex-grow-1">
+<div class="modal fade" id="modalEmpresa" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Nueva Empresa</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="formEmpresa">
+                    <div class="mb-2">
+                        <label class="small fw-bold">Nombre Comercial</label>
+                        <input type="text" id="cName" class="form-control" placeholder="Ej: FCI Logistic" required>
                     </div>
-
-                    <form id="emailLoginForm">
-                        <div class="mb-3 text-start">
-                            <label class="small fw-bold mb-1">Email</label>
-                            <input type="email" id="loginEmail" class="form-control" required>
-                        </div>
-                        <div class="mb-4 text-start">
-                            <label class="small fw-bold mb-1">Contraseña</label>
-                            <input type="password" id="loginPass" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm">Entrar</button>
-                    </form>
-                </div>
+                    <div class="mb-2">
+                        <label class="small fw-bold">Email del Administrador</label>
+                        <input type="email" id="cAdminEmail" class="form-control" placeholder="admin@cliente.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">Contraseña de Acceso</label>
+                        <input type="text" id="cPassword" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <small class="text-muted">Anota esta contraseña para enviarla al cliente.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">Plan</label>
+                        <select id="cPlan" class="form-select">
+                            <option value="Básico">Básico ($29)</option>
+                            <option value="Pro">Pro ($79)</option>
+                            <option value="Enterprise">Enterprise (Custom)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Crear Empresa y Usuario</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { logout, authGuard } from './auth.js';
+    // Importamos createCompany desde el db.js corregido
+    import { createCompany, getCompanies, toggleCompanyStatus, getUsersByCompany, addPayment, getCompanyPayments, getCompanyStats, getSupplies, exportToXLS } from './db.js';
 
-    <script type="module">
-        // Importamos desde TUS archivos locales para mantener la consistencia de 'db' y 'auth'
-        import { login, loginWithGoogle } from './auth.js';
+    authGuard('SUPER_ADMIN'); 
+    document.getElementById('logoutBtn').onclick = logout;
 
-        // Funciones Globales para los botones HTML
-        window.abrirModalLogin = () => {
-            new bootstrap.Modal(document.getElementById('loginModal')).show();
-        };
+    // ... (Mantén las funciones loadSidebar, selectCompany, etc. igual que antes) ...
 
-        window.iniciarDemo = () => {
-            const demoUser = { role: 'DEMO', companyId: 'DEMO_CORP', name: 'Usuario Invitado' };
-            localStorage.setItem('user_data', JSON.stringify(demoUser));
-            localStorage.setItem('branding_name', 'Demo Corporation');
-            window.location.href = 'app.html';
-        };
+    // ACTUALIZA ESTA PARTE (Evento de crear empresa):
+    document.getElementById('formEmpresa').onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const btn = e.target.querySelector('button');
+        const originalText = btn.innerText;
+        btn.innerText = "Creando...";
+        btn.disabled = true;
 
-        // 1. EVENTO LOGIN GOOGLE
-        const btnGoogle = document.getElementById('btnGoogleLogin');
-        if(btnGoogle){
-            btnGoogle.addEventListener('click', async () => {
-                try {
-                    await loginWithGoogle(); // Usamos la función de auth.js
-                } catch (error) {
-                    console.error("Error en index:", error);
-                    alert("No se pudo iniciar sesión. Verifica que estés usando http://localhost");
-                }
+        try {
+            await createCompany({
+                name: document.getElementById('cName').value,
+                adminEmail: document.getElementById('cAdminEmail').value,
+                password: document.getElementById('cPassword').value, // Nuevo campo
+                plan: document.getElementById('cPlan').value
             });
+            alert("Empresa y Usuario Admin creados exitosamente.");
+            bootstrap.Modal.getInstance(document.getElementById('modalEmpresa')).hide();
+            e.target.reset();
+            loadSidebar(); // Recargar lista
+        } catch (error) {
+            alert("Error: " + error.message);
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
         }
+    };
 
-        // 2. EVENTO LOGIN EMAIL
-        const formEmail = document.getElementById('emailLoginForm');
-        if(formEmail){
-            formEmail.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const em = document.getElementById('loginEmail').value;
-                const pa = document.getElementById('loginPass').value;
-                try {
-                    await login(em, pa); // Usamos la función de auth.js
-                } catch (error) {
-                    console.error(error);
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+    // ... (Resto del script igual) ...
+</script>
