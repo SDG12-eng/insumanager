@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Tu configuración (EXPORTADA para usar en db.js)
+// EXPORTAMOS LA CONFIGURACIÓN (CRÍTICO)
 export const firebaseConfig = {
   apiKey: "AIzaSyA5pUM_BycmKkbfhreDUrUH5CJEg_ykUW4",
   authDomain: "proyectocoorporativo.firebaseapp.com",
