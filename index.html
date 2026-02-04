@@ -4,359 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SaaS Corp | Gestión de Insumos</title>
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    
+    <link rel="manifest" href="manifest.json">
     <style>
-        :root {
-            --primary: #2563eb;
-            --secondary: #1e293b;
-            --accent: #3b82f6;
-        }
-        
-        body { font-family: 'Segoe UI', system-ui, sans-serif; }
-        
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, var(--secondary) 0%, #0f172a 100%);
-            color: white;
-            padding: 100px 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Cards de Precios */
-        .pricing-card {
-            transition: transform 0.3s;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-        }
-        .pricing-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary);
-        }
-        .pricing-header {
-            background: #f8fafc;
-            padding: 2rem;
-            border-bottom: 1px solid #e2e8f0;
-            border-radius: 12px 12px 0 0;
-        }
-        
-        /* Login Modal */
-        .google-btn {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            color: #333;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            transition: 0.2s;
-        }
-        .google-btn:hover { background-color: #f1f1f1; }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
+        .login-card { border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: none; }
+        .btn-pwa { display: none; }
     </style>
 </head>
 <body>
+    <div class="container d-flex flex-column justify-content-center align-items-center vh-100">
+        <div class="card login-card p-4" style="max-width: 400px; width: 100%;">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary"><i class="bi bi-box-seam"></i> SaaS Corp</h2>
+                <p class="text-muted">Gestión Corporativa Inteligente</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Email Corporativo</label>
+                    <input type="email" id="email" class="form-control" required placeholder="nombre@empresa.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3">Iniciar Sesión</button>
+            </form>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="#"><i class="bi bi-box-seam-fill"></i> SaaS Corp</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <button id="googleBtn" class="btn btn-outline-danger w-100">
+                <i class="bi bi-google me-2"></i> Acceder con Google
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link" href="#features">Características</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#pricing">Planes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">Contacto</a></li>
-                    <li class="nav-item ms-3">
-                        <button class="btn btn-primary px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#loginModal">
-                            <i class="bi bi-person-circle me-2"></i>Iniciar Sesión
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
-    <section class="hero-section text-center">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <h1 class="display-4 fw-bold mb-4">Control Total de tus Insumos Corporativos</h1>
-                    <p class="lead mb-5 text-white-50">Una plataforma multi-empresa para gestionar inventarios, usuarios y reportes en tiempo real. Elimina las pérdidas y optimiza tus recursos hoy mismo.</p>
-                    <div class="d-flex justify-content-center gap-3">
-                        <a href="#pricing" class="btn btn-light btn-lg px-5 rounded-pill fw-bold text-primary">Ver Precios</a>
-                        <button class="btn btn-outline-light btn-lg px-5 rounded-pill" data-bs-toggle="modal" data-bs-target="#loginModal">Demo Gratis</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="features" class="py-5">
-        <div class="container py-5">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">Todo lo que necesitas</h2>
-                <p class="text-muted">Diseñado para escalar con tu empresa</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4 text-center">
-                    <div class="p-4">
-                        <i class="bi bi-buildings feature-icon"></i>
-                        <h4>Multi-Empresa</h4>
-                        <p class="text-muted">Gestiona múltiples sucursales o empresas desde un solo panel administrativo centralizado.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 text-center">
-                    <div class="p-4">
-                        <i class="bi bi-shield-lock feature-icon"></i>
-                        <h4>Roles y Seguridad</h4>
-                        <p class="text-muted">Control de acceso granular. Define quién puede ver, editar o eliminar insumos.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 text-center">
-                    <div class="p-4">
-                        <i class="bi bi-graph-up-arrow feature-icon"></i>
-                        <h4>Reportes Inteligentes</h4>
-                        <p class="text-muted">Exporta datos a CSV, visualiza métricas de consumo y recibe alertas de stock bajo.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="pricing" class="py-5 bg-light">
-        <div class="container py-5">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">Planes Flexibles</h2>
-                <p class="text-muted">Elige el plan que se adapte a tu operación</p>
-            </div>
-            <div class="row justify-content-center g-4">
-                <div class="col-md-4">
-                    <div class="pricing-card bg-white h-100">
-                        <div class="pricing-header text-center">
-                            <h4>Básico</h4>
-                            <h2 class="fw-bold">$29<span class="fs-6 text-muted">/mes</span></h2>
-                        </div>
-                        <div class="p-4">
-                            <ul class="list-unstyled mb-4">
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>1 Empresa</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>3 Usuarios</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Gestión de Insumos</li>
-                                <li class="text-muted mb-2"><i class="bi bi-x-circle me-2"></i>Sin Reportes Avanzados</li>
-                            </ul>
-                            <button class="btn btn-outline-primary w-100 rounded-pill" onclick="alert('Redirigiendo a pasarela de pago...')">Seleccionar</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="pricing-card bg-white h-100 border-primary">
-                        <div class="pricing-header text-center bg-primary text-white">
-                            <h4>Pro (Recomendado)</h4>
-                            <h2 class="fw-bold">$79<span class="fs-6 text-white-50">/mes</span></h2>
-                        </div>
-                        <div class="p-4">
-                            <ul class="list-unstyled mb-4">
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>3 Empresas</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>10 Usuarios</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Alertas de Stock</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Soporte Prioritario</li>
-                            </ul>
-                            <button class="btn btn-primary w-100 rounded-pill" onclick="alert('Redirigiendo a pasarela de pago...')">Seleccionar</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="pricing-card bg-white h-100">
-                        <div class="pricing-header text-center">
-                            <h4>Enterprise</h4>
-                            <h2 class="fw-bold">A medida</h2>
-                        </div>
-                        <div class="p-4">
-                            <ul class="list-unstyled mb-4">
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Empresas Ilimitadas</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Usuarios Ilimitados</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>API & Auditoría</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>SLA Garantizado</li>
-                            </ul>
-                            <button class="btn btn-outline-dark w-100 rounded-pill" href="#contact">Contactar Ventas</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact" class="py-5">
-        <div class="container py-5">
-            <div class="row justify-content-center">
-                <div class="col-md-8 text-center">
-                    <h2 class="fw-bold mb-4">¿Dudas? Contáctanos</h2>
-                    <p class="mb-4">Nuestro equipo de soporte está listo para ayudarte a configurar tu entorno corporativo.</p>
-                    <form class="row g-3 text-start">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Nombre">
-                        </div>
-                        <div class="col-md-6">
-                            <input type="email" class="form-control" placeholder="Email Corporativo">
-                        </div>
-                        <div class="col-12">
-                            <textarea class="form-control" rows="4" placeholder="Mensaje"></textarea>
-                        </div>
-                        <div class="col-12 text-center">
-                            <button type="submit" class="btn btn-dark px-5">Enviar Mensaje</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="bg-dark text-white py-4 text-center">
-        <div class="container">
-            <small>&copy; 2024 SaaS Corp. Todos los derechos reservados.</small>
-        </div>
-    </footer>
-
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Acceso Corporativo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body px-4 pb-4">
-                    
-                    <button id="btnGoogleLogin" class="google-btn mb-3">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="Google">
-                        Continuar con Google
-                    </button>
-
-                    <div class="text-center text-muted my-3 position-relative">
-                        <hr>
-                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-2 small">O ingresa con credenciales</span>
-                    </div>
-
-                    <form id="emailLoginForm">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Correo Electrónico</label>
-                            <input type="email" id="loginEmail" class="form-control" placeholder="nombre@empresa.com" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Contraseña</label>
-                            <input type="password" id="loginPass" class="form-control" placeholder="******" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">ID Empresa (Tenant)</label>
-                            <input type="text" id="loginCompanyId" class="form-control" placeholder="Ej: EMP-001" required>
-                            <div class="form-text">Si eres Super Admin, deja este campo como 'CORP'.</div>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 fw-bold">Entrar al Sistema</button>
-                    </form>
-                    
-                    <div id="loginAlert" class="alert alert-danger mt-3 d-none" role="alert"></div>
-                </div>
-                <div class="modal-footer justify-content-center bg-light border-0">
-                    <small class="text-muted">¿No tienes cuenta? <a href="#contact">Solicita una demo</a></small>
-                </div>
+            <div class="mt-4 text-center">
+                <button id="installApp" class="btn btn-sm btn-dark btn-pwa">
+                    <i class="bi bi-download me-1"></i> Instalar App
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script type="module">
-        // 1. Importar funciones necesarias
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { loginUser, loginWithGoogle } from './auth.js';
 
-        // 2. Tu Configuración (Proporcionada en el prompt)
-        const firebaseConfig = {
-            apiKey: "AIzaSyA5pUM_BycmKkbfhreDUrUH5CJEg_ykUW4",
-            authDomain: "proyectocoorporativo.firebaseapp.com",
-            projectId: "proyectocoorporativo",
-            storageBucket: "proyectocoorporativo.firebasestorage.app",
-            messagingSenderId: "152806986808",
-            appId: "1:152806986808:web:6944d32424e27dbf9e82cd"
-        };
-
-        // 3. Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
-
-        // 4. Lógica de Login con Google
-        const btnGoogle = document.getElementById('btnGoogleLogin');
-        btnGoogle.addEventListener('click', async () => {
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                console.log("Usuario Google:", user);
-                // Aquí podrías verificar en Firestore si el email pertenece a una empresa
-                alert(`Bienvenido ${user.displayName}. Redirigiendo al Dashboard...`);
-                // window.location.href = "dashboard.html"; // Descomentar cuando tengas el dashboard
-            } catch (error) {
-                console.error(error);
-                showAlert(error.message);
-            }
-        });
-
-        // 5. Lógica de Login Email + Contraseña + Empresa
-        const loginForm = document.getElementById('emailLoginForm');
-        loginForm.addEventListener('submit', async (e) => {
+        // PWA Installer
+        let deferredPrompt;
+        const installBtn = document.getElementById('installApp');
+        window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
-            const companyId = document.getElementById('loginCompanyId').value;
-
-            try {
-                // Autenticación básica con Firebase Auth
-                const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-                const user = userCredential.user;
-
-                // Simulación de lógica Multi-Tenant:
-                // En un caso real, leeríamos de Firestore /users/{uid} para ver si user.companyId coincide con companyId
-                
-                console.log(`Usuario autenticado: ${email}, Intento acceso a: ${companyId}`);
-                
-                // Mensaje de éxito
-                alert(`Acceso concedido a empresa: ${companyId.toUpperCase()}\nRedirigiendo al panel de control...`);
-                
-                // Redirección futura:
-                // window.location.href = "dashboard.html";
-
-            } catch (error) {
-                console.error("Error Login:", error);
-                let msg = "Error al iniciar sesión.";
-                if(error.code === 'auth/invalid-credential') msg = "Credenciales incorrectas.";
-                if(error.code === 'auth/user-not-found') msg = "Usuario no encontrado.";
-                showAlert(msg);
+            deferredPrompt = e;
+            installBtn.style.display = 'inline-block';
+        });
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') installBtn.style.display = 'none';
+                deferredPrompt = null;
             }
         });
 
-        // Helper para mostrar errores
-        function showAlert(message) {
-            const alertBox = document.getElementById('loginAlert');
-            alertBox.textContent = message;
-            alertBox.classList.remove('d-none');
-            setTimeout(() => alertBox.classList.add('d-none'), 5000);
+        // Register SW
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js');
         }
+
+        // Login Logic
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await loginUser(document.getElementById('email').value, document.getElementById('password').value);
+            } catch (error) { alert("Error: " + error.message); }
+        });
+
+        document.getElementById('googleBtn').addEventListener('click', async () => {
+            try { await loginWithGoogle(); } catch (error) { alert("Error Google: " + error.message); }
+        });
     </script>
 </body>
 </html>
