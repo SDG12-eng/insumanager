@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Gestión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <div class="bg-white border-end" id="sidebar-wrapper">
+            <div class="sidebar-heading border-bottom bg-light text-center py-4">
+                <h5 class="fw-bold text-primary" id="company-branding">Cargando...</h5>
+                <small class="text-muted">Sistema de Insumos</small>
+            </div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!"><i class="bi bi-box-seam me-2"></i> Inventario</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!"><i class="bi bi-people me-2"></i> Empleados</a>
+                <a class="list-group-item list-group-item-action list-group-item-light p-3 text-danger" href="#" id="logoutBtn"><i class="bi bi-power me-2"></i> Salir</a>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper" class="w-100">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom px-4">
+                <button class="btn btn-primary" id="sidebarToggle">Menu</button>
+                <div class="ms-auto" id="user-info">Usuario</div>
+            </nav>
+
+            <div class="container-fluid p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold">Inventario General</h2>
+                    <button class="btn btn-success" id="btnExport">
+                        <i class="bi bi-file-earmark-excel"></i> Descargar Reporte XLS
+                    </button>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <table class="table table-hover">
+                            <thead><tr><th>Insumo</th><th>Categoría</th><th>Stock</th><th>Estado</th></tr></thead>
+                            <tbody id="inventoryTable">
+                                <tr><td>Cascos Seguridad</td><td>EPP</td><td>150</td><td><span class="badge bg-success">OK</span></td></tr>
+                                <tr><td>Guantes Látex</td><td>Consumibles</td><td>20</td><td><span class="badge bg-warning">Bajo</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { logout, authGuard } from './auth.js';
+        import { getSupplies, exportToXLS } from './db.js';
+
+        authGuard(); // Verifica sesión
+        document.getElementById('logoutBtn').onclick = logout;
+
+        // 1. CARGAR MARCA BLANCA (BRANDING)
+        const companyName = localStorage.getItem('branding_name') || "Mi Empresa";
+        document.getElementById('company-branding').innerText = "Panel de " + companyName;
+        document.title = "Panel - " + companyName;
+
+        const userData = JSON.parse(localStorage.getItem('user_data'));
+        document.getElementById('user-info').innerText = userData.email;
+
+        // 2. Cargar Datos Reales
+        async function loadData() {
+            const list = await getSupplies(userData.companyId);
+            if(list.length > 0) {
+                const tbody = document.getElementById('inventoryTable');
+                tbody.innerHTML = list.map(s => `
+                    <tr>
+                        <td>${s.name}</td>
+                        <td>${s.category}</td>
+                        <td>${s.stock}</td>
+                        <td>${s.stock < 5 ? '<span class="badge bg-danger">CRÍTICO</span>' : '<span class="badge bg-success">OK</span>'}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            // Configurar Exportación con los datos cargados
+            document.getElementById('btnExport').onclick = () => {
+                // Si la lista está vacía usa datos dummy para probar, sino la lista real
+                const exportData = list.length > 0 ? list : [
+                    {name: 'Cascos Demo', category: 'EPP', stock: 150}, 
+                    {name: 'Guantes Demo', category: 'EPP', stock: 20}
+                ];
+                exportToXLS(exportData, `Inventario_${companyName.replace(/ /g,"_")}`);
+            };
+        }
+        loadData();
+
+        // Toggle Sidebar
+        document.getElementById('sidebarToggle').onclick = () => {
+            document.body.classList.toggle('sb-sidenav-toggled');
+        };
+    </script>
+</body>
+</html>
