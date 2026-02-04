@@ -7,397 +7,608 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
 
     <style>
-        /* Estilos específicos para la Landing si no están en style.css */
-        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        /* --- ESTILOS GLOBALES --- */
+        :root { --primary: #4f46e5; --secondary: #1e1b4b; --bg-light: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-light); overflow-x: hidden; }
+        .hidden { display: none !important; }
         
-        .hero-bg {
-            background: radial-gradient(circle at top right, #4f46e5 0%, #312e81 100%);
-            position: relative;
-            overflow: hidden;
-        }
+        /* LANDING STYLES */
+        .hero-bg { background: radial-gradient(circle at top right, #4f46e5 0%, #312e81 100%); color: white; padding: 100px 0; }
+        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .price-card { border-radius: 20px; border: none; transition: transform 0.3s; background: white; }
+        .price-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .price-card.popular { background: #1e1b4b; color: white; transform: scale(1.05); z-index: 10; }
         
-        .hero-bg::before {
-            content: '';
-            position: absolute;
-            width: 150%;
-            height: 100%;
-            background: url('https://cdn.svgporn.com/logos/google-cloud.svg') no-repeat; /* Solo textura ejemplo */
-            opacity: 0.03;
-            transform: rotate(-15deg);
-            top: -20%;
-            left: -20%;
-        }
-
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .price-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 24px;
-            transition: all 0.3s ease;
-            background: white;
-        }
+        /* APP STYLES (ADMIN & CLIENT) */
+        .sidebar { min-height: 100vh; width: 260px; background: white; border-right: 1px solid #e2e8f0; position: fixed; top: 0; left: 0; z-index: 100; transition: margin 0.3s; }
+        .main-content { margin-left: 260px; padding: 30px; transition: margin 0.3s; width: calc(100% - 260px); }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
         
-        .price-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px -5px rgba(79, 70, 229, 0.15);
-            border-color: #4f46e5;
-        }
+        /* Super Admin Layout Especial */
+        .master-layout { display: flex; height: 100vh; overflow: hidden; }
+        .sa-sidebar { width: 350px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; overflow-y: auto; }
+        .sa-content { flex: 1; background: #f3f4f6; overflow-y: auto; padding: 30px; }
+        .company-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: 0.2s; }
+        .company-item:hover { background-color: #f9fafb; }
+        .company-item.active { background-color: #eef2ff; border-left: 4px solid var(--primary); }
 
-        .price-card.popular {
-            background: #1e1b4b;
-            color: white;
-            border: none;
-            transform: scale(1.05);
-            z-index: 10;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-        
-        .price-card.popular:hover {
-            transform: scale(1.05) translateY(-10px);
-        }
-
-        .price-card.popular .text-muted { color: #94a3b8 !important; }
-        .price-card.popular h2, .price-card.popular h5 { color: white !important; }
-        .price-card.popular li i { color: #818cf8 !important; }
-
-        .btn-gradient {
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-            border: none;
-            color: white;
-            font-weight: 600;
-            transition: opacity 0.3s;
-        }
-        .btn-gradient:hover { opacity: 0.9; color: white; }
-
-        .google-btn {
-            background: white;
-            border: 1px solid #cbd5e1;
-            color: #475569;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .google-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+        /* Utilidades */
+        .google-btn { background: white; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; transition: 0.2s; }
+        .google-btn:hover { background: #f8fafc; }
+        .badge-status-active { background-color: #10b981; color: white; }
+        .badge-status-blocked { background-color: #ef4444; color: white; }
     </style>
 </head>
-<body data-bs-spy="scroll" data-bs-target="#navbar" data-bs-offset="100">
+<body>
 
-    <nav id="navbar" class="navbar navbar-expand-lg fixed-top glass-nav py-3">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-primary fs-4" href="#">
-                <i class="bi bi-layers-half me-2"></i>ArchiveMaster
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center gap-3">
-                    <li class="nav-item"><a class="nav-link fw-medium" href="#features">Soluciones</a></li>
-                    <li class="nav-item"><a class="nav-link fw-medium" href="#pricing">Precios</a></li>
-                    <li class="nav-item"><a class="nav-link fw-medium" href="#contact">Contacto</a></li>
-                    <li class="nav-item border-start ps-3 ms-2 d-none d-lg-block"></li>
-                    <li class="nav-item">
-                        <button onclick="startDemo()" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
-                            <i class="bi bi-play-circle me-1"></i> Demo
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button data-bs-toggle="modal" data-bs-target="#loginModal" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
-                            Ingresar
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <header class="hero-bg text-white pt-5 pb-5">
-        <div class="container pt-5 mt-5 pb-5">
-            <div class="row align-items-center justify-content-center text-center pt-4">
-                <div class="col-lg-10">
-                    <span class="badge bg-indigo-400 bg-opacity-25 border border-white border-opacity-25 rounded-pill px-3 py-2 mb-4 backdrop-blur-sm">
-                        🚀 Gestión de Insumos v2.0
-                    </span>
-                    <h1 class="display-3 fw-bolder mb-4 lh-tight">
-                        Control Total para Empresas <br>
-                        <span class="text-info">Sin Complicaciones</span>
-                    </h1>
-                    <p class="lead mb-5 text-white-50 mx-auto" style="max-width: 700px;">
-                        La plataforma SaaS diseñada para corporaciones. Gestiona múltiples sedes, usuarios y stock en tiempo real con reportes inteligentes.
-                    </p>
-                    <div class="d-flex justify-content-center gap-3 flex-wrap">
-                        <button onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow-lg">
-                            Ver Planes
-                        </button>
-                        <button onclick="startDemo()" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-bold">
-                            Prueba Gratuita
-                        </button>
-                    </div>
+    <div id="view-landing">
+        <nav class="navbar navbar-expand-lg fixed-top glass-nav py-3">
+            <div class="container">
+                <a class="navbar-brand fw-bold text-primary fs-4" href="#"><i class="bi bi-layers-half me-2"></i>ArchiveMaster</a>
+                <div class="d-flex gap-2">
+                    <button onclick="window.startDemo()" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Demo</button>
+                    <button onclick="window.showLoginModal()" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Ingresar</button>
                 </div>
             </div>
-            <div class="row justify-content-center mt-5">
-                <div class="col-lg-10">
-                    <img src="https://dashkit.goodthemes.co/assets/img/covers/desktop-dark.png" class="img-fluid rounded-4 shadow-lg border border-white border-opacity-10" alt="Dashboard Preview">
-                </div>
-            </div>
-        </div>
-    </header>
+        </nav>
 
-    <section id="features" class="py-5 bg-white">
-        <div class="container py-5">
-            <div class="text-center mb-5">
-                <h6 class="text-primary fw-bold uppercase ls-1">¿POR QUÉ ELEGIRNOS?</h6>
-                <h2 class="fw-bold display-6">Todo lo que necesitas para escalar</h2>
+        <header class="hero-bg">
+            <div class="container mt-5 text-center">
+                <span class="badge bg-white bg-opacity-25 border border-white rounded-pill px-3 py-2 mb-3">v2.0 Enterprise Ready</span>
+                <h1 class="display-3 fw-bolder mb-4">Gestión de Insumos Corporativos</h1>
+                <p class="lead text-white-50 mx-auto mb-5" style="max-width: 700px;">Control total multi-sede. Automatiza inventarios, gestiona usuarios y exporta reportes financieros.</p>
+                <button onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow">Ver Planes</button>
             </div>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="p-4 rounded-4 bg-light h-100 border border-transparent hover-border-primary transition">
-                        <div class="display-6 text-primary mb-3"><i class="bi bi-buildings"></i></div>
-                        <h4>Multi-Empresa</h4>
-                        <p class="text-muted">Panel centralizado para gestionar infinitas sucursales o clientes de forma aislada y segura.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-4 rounded-4 bg-light h-100">
-                        <div class="display-6 text-success mb-3"><i class="bi bi-file-earmark-excel"></i></div>
-                        <h4>Reportes XLS</h4>
-                        <p class="text-muted">Exporta inventarios, movimientos y auditorías a formato Excel nativo con un solo clic.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-4 rounded-4 bg-light h-100">
-                        <div class="display-6 text-warning mb-3"><i class="bi bi-shield-lock"></i></div>
-                        <h4>Seguridad SaaS</h4>
-                        <p class="text-muted">Gestión automática de accesos, bloqueo por falta de pago y roles granulares.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </header>
 
-    <section id="pricing" class="py-5" style="background-color: #f8fafc;">
-        <div class="container py-5">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold display-6">Planes Flexibles</h2>
-                <p class="text-muted">Cancela cuando quieras. Sin contratos forzosos.</p>
-            </div>
-
-            <div class="row justify-content-center align-items-center g-4">
-                <div class="col-lg-3 col-md-6">
-                    <div class="card price-card p-4 h-100">
-                        <div class="card-body text-center">
+        <section id="pricing" class="py-5">
+            <div class="container py-5">
+                <div class="text-center mb-5"><h2 class="fw-bold">Planes Flexibles</h2></div>
+                <div class="row justify-content-center g-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card price-card p-4 text-center h-100">
                             <h5 class="fw-bold text-secondary">Basic</h5>
-                            <div class="my-4">
-                                <span class="h1 fw-bold">$10</span><span class="text-muted">/mes</span>
-                            </div>
-                            <ul class="list-unstyled text-start small mb-4 space-y-2">
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> 1 Empresa</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> 3 Usuarios</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Control de Stock</li>
-                                <li class="text-muted"><i class="bi bi-x-circle me-2"></i> Sin Reportes</li>
-                            </ul>
-                            <button class="btn btn-outline-primary w-100 rounded-pill fw-bold">Elegir Basic</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-6">
-                    <div class="card price-card popular p-5">
-                        <div class="position-absolute top-0 start-50 translate-middle">
-                            <span class="badge bg-gradient text-white shadow rounded-pill px-3 py-2">MÁS VENDIDO</span>
-                        </div>
-                        <div class="card-body text-center">
-                            <h5 class="fw-bold">Pro</h5>
-                            <div class="my-4">
-                                <span class="h1 fw-bold">$25</span><span class="text-white-50">/mes</span>
-                            </div>
-                            <ul class="list-unstyled text-start mb-5">
-                                <li class="mb-3"><i class="bi bi-check-circle-fill me-2"></i> <strong>Usuarios Ilimitados</strong></li>
-                                <li class="mb-3"><i class="bi bi-check-circle-fill me-2"></i> Reportes Excel/PDF</li>
-                                <li class="mb-3"><i class="bi bi-check-circle-fill me-2"></i> Alertas de Stock Bajo</li>
-                                <li class="mb-3"><i class="bi bi-check-circle-fill me-2"></i> Soporte por Email</li>
-                            </ul>
-                            <button class="btn btn-light text-primary w-100 rounded-pill fw-bold py-3 shadow">Comenzar Ahora</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="card price-card p-4 h-100">
-                        <div class="card-body text-center">
-                            <h5 class="fw-bold text-secondary">Business</h5>
-                            <div class="my-4">
-                                <span class="h1 fw-bold">$40</span><span class="text-muted">/mes</span>
-                            </div>
+                            <h2 class="fw-bold my-3">$10<small class="fs-6 text-muted">/mes</small></h2>
                             <ul class="list-unstyled text-start small mb-4">
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Multi-Sede</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Auditoría de Cambios</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> API Access</li>
-                                <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Soporte Prioritario</li>
+                                <li class="mb-2"><i class="bi bi-check text-primary"></i> 1 Empresa</li>
+                                <li class="mb-2"><i class="bi bi-check text-primary"></i> 3 Usuarios</li>
                             </ul>
-                            <button class="btn btn-outline-dark w-100 rounded-pill fw-bold">Elegir Business</button>
+                            <button class="btn btn-outline-primary w-100 rounded-pill">Elegir</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card price-card popular p-5 text-center">
+                            <span class="badge bg-warning text-dark position-absolute top-0 start-50 translate-middle">POPULAR</span>
+                            <h5 class="fw-bold">Pro</h5>
+                            <h2 class="fw-bold my-3">$25<small class="fs-6 text-white-50">/mes</small></h2>
+                            <ul class="list-unstyled text-start mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i> Usuarios Ilimitados</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i> Reportes Excel</li>
+                                <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i> Soporte Email</li>
+                            </ul>
+                            <button class="btn btn-light w-100 rounded-pill fw-bold text-primary">Empezar Ahora</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card price-card p-4 text-center h-100">
+                            <h5 class="fw-bold text-secondary">Business</h5>
+                            <h2 class="fw-bold my-3">$40<small class="fs-6 text-muted">/mes</small></h2>
+                            <ul class="list-unstyled text-start small mb-4">
+                                <li class="mb-2"><i class="bi bi-check text-primary"></i> Multi-Sede</li>
+                                <li class="mb-2"><i class="bi bi-check text-primary"></i> Auditoría</li>
+                                <li class="mb-2"><i class="bi bi-check text-primary"></i> Soporte VIP</li>
+                            </ul>
+                            <button class="btn btn-outline-dark w-100 rounded-pill">Elegir</button>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="text-center mt-5">
-                <a href="#contact" class="text-decoration-none fw-bold">¿Necesitas algo más grande? Cotizar Enterprise <i class="bi bi-arrow-right"></i></a>
+        </section>
+
+        <section id="contact" class="py-5 bg-white">
+            <div class="container py-5 text-center">
+                <h2>¿Necesitas ayuda?</h2>
+                <p class="text-muted">Nuestro equipo de soporte está listo para asistirte.</p>
+                <button class="btn btn-primary rounded-pill px-5">Contactar Soporte</button>
+            </div>
+        </section>
+    </div>
+
+    <div id="view-super-admin" class="hidden master-layout">
+        <div class="sa-sidebar">
+            <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center sticky-top">
+                <span class="fw-bold"><i class="bi bi-shield-lock"></i> MASTER ADMIN</span>
+                <button onclick="window.logout()" class="btn btn-sm btn-outline-danger"><i class="bi bi-power"></i></button>
+            </div>
+            <div class="p-3 border-bottom bg-light">
+                <button class="btn btn-primary w-100 mb-2 shadow-sm" onclick="window.showCreateCompanyModal()">
+                    <i class="bi bi-plus-lg"></i> Nueva Empresa
+                </button>
+                <input type="text" id="sa-search" class="form-control form-control-sm" placeholder="Buscar cliente...">
+            </div>
+            <div id="sa-company-list">
+                <div class="text-center p-4 text-muted small">Cargando...</div>
             </div>
         </div>
-    </section>
 
-    <section id="contact" class="py-5 bg-white">
-        <div class="container py-5">
-            <div class="row justify-content-center">
-                <div class="col-lg-6">
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold">Contáctanos</h2>
-                        <p class="text-muted">¿Dudas sobre la implementación? Te respondemos hoy.</p>
+        <div class="sa-content">
+            <div id="sa-empty-state" class="text-center mt-5 pt-5 text-muted">
+                <i class="bi bi-building display-1 opacity-25"></i>
+                <h3 class="mt-3">Selecciona un cliente</h3>
+                <p>Gestiona sus usuarios, pagos y estado de servicio.</p>
+            </div>
+
+            <div id="sa-company-detail" class="hidden">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-0" id="sa-detail-name">Empresa</h2>
+                        <span class="badge bg-light text-dark border mt-1" id="sa-detail-id">ID</span>
+                        <span class="badge bg-primary mt-1" id="sa-detail-plan">Plan</span>
+                        <span id="sa-detail-status" class="badge mt-1">Estado</span>
                     </div>
-                    <form class="p-4 border rounded-4 bg-light shadow-sm">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold">Nombre</label>
-                                <input type="text" class="form-control" placeholder="Tu nombre">
+                    <div class="d-flex gap-2">
+                        <button onclick="window.downloadReportAdmin()" class="btn btn-outline-dark"><i class="bi bi-file-earmark-excel"></i> Reporte XLS</button>
+                        <button id="sa-btn-block" class="btn btn-danger"><i class="bi bi-slash-circle"></i> Bloquear</button>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4"><div class="stat-card border-start border-4 border-primary"><h6>Usuarios</h6><h3 id="sa-stat-users">0</h3></div></div>
+                    <div class="col-md-4"><div class="stat-card border-start border-4 border-success"><h6>Insumos</h6><h3 id="sa-stat-items">0</h3></div></div>
+                    <div class="col-md-4"><div class="stat-card border-start border-4 border-warning"><h6>Facturación</h6><h3 id="sa-stat-rev">$0</h3></div></div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <ul class="nav nav-tabs card-header-tabs" id="saTabs">
+                            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-sa-payments">💳 Pagos</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-sa-users">👥 Usuarios</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="tab-sa-payments">
+                                <div class="row">
+                                    <div class="col-md-4 border-end">
+                                        <h6>Registrar Pago</h6>
+                                        <form id="sa-payment-form">
+                                            <input type="number" id="pay-amount" class="form-control mb-2" placeholder="Monto USD" required>
+                                            <select id="pay-method" class="form-select mb-2">
+                                                <option>Transferencia</option><option>Tarjeta</option><option>Efectivo</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-success w-100">Guardar Pago</button>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-8 px-4">
+                                        <h6>Historial</h6>
+                                        <table class="table table-sm"><thead><tr><th>Fecha</th><th>Monto</th><th>Método</th></tr></thead><tbody id="sa-payments-table"></tbody></table>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold">Empresa</label>
-                                <input type="text" class="form-control" placeholder="Nombre de empresa">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label small fw-bold">Email</label>
-                                <input type="email" class="form-control" placeholder="correo@empresa.com">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label small fw-bold">Mensaje</label>
-                                <textarea class="form-control" rows="4"></textarea>
-                            </div>
-                            <div class="col-12">
-                                <button class="btn btn-primary w-100 py-2 fw-bold rounded-pill">Enviar Mensaje</button>
+                            <div class="tab-pane fade" id="tab-sa-users">
+                                <table class="table table-hover"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th></tr></thead><tbody id="sa-users-table"></tbody></table>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <footer class="bg-dark text-white py-5">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <h5 class="fw-bold text-white mb-3">ArchiveMaster</h5>
-                    <p class="text-white-50 small">Plataforma líder en gestión de insumos corporativos. Simplificamos la logística de tu empresa.</p>
-                </div>
-                <div class="col-md-2">
-                    <h6 class="fw-bold mb-3">Producto</h6>
-                    <ul class="list-unstyled small text-white-50">
-                        <li><a href="#" class="text-reset text-decoration-none">Funcionalidades</a></li>
-                        <li><a href="#" class="text-reset text-decoration-none">Precios</a></li>
-                        <li><a href="#" class="text-reset text-decoration-none">API</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-2">
-                    <h6 class="fw-bold mb-3">Empresa</h6>
-                    <ul class="list-unstyled small text-white-50">
-                        <li><a href="#" class="text-reset text-decoration-none">Nosotros</a></li>
-                        <li><a href="#" class="text-reset text-decoration-none">Blog</a></li>
-                        <li><a href="#" class="text-reset text-decoration-none">Contacto</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <button class="btn btn-sm btn-outline-light rounded-pill px-3">Soporte Técnico</button>
-                    <p class="small text-white-50 mt-3">&copy; 2026 ArchiveMaster Inc.</p>
+    <div id="view-client-app" class="hidden">
+        <div class="sidebar d-flex flex-column p-3">
+            <div class="mb-4 text-center">
+                <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle d-inline-block mb-2"><i class="bi bi-building fs-3"></i></div>
+                <h6 class="fw-bold text-primary mb-0" id="app-company-name">Cargando...</h6>
+                <small class="text-muted">Panel de Gestión</small>
+            </div>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item"><a href="#" class="nav-link active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                <li><a href="#" class="nav-link text-dark"><i class="bi bi-box-seam me-2"></i> Inventario</a></li>
+                <li><a href="#" class="nav-link text-dark"><i class="bi bi-arrow-left-right me-2"></i> Movimientos</a></li>
+            </ul>
+            <hr>
+            <div class="d-flex align-items-center justify-content-between">
+                <small class="text-muted" id="app-user-email">user@mail.com</small>
+                <button onclick="window.logout()" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <div class="main-content bg-light">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">Inventario General</h3>
+                <button onclick="window.downloadReportClient()" class="btn btn-success"><i class="bi bi-file-earmark-excel me-2"></i> Exportar XLS</button>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4"><div class="stat-card border-top border-4 border-info"><h6>Total Items</h6><h2 id="client-stat-total">0</h2></div></div>
+                <div class="col-md-4"><div class="stat-card border-top border-4 border-danger"><h6>Stock Bajo</h6><h2 id="client-stat-low">0</h2></div></div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-primary" onclick="alert('Función crear insumo')">+ Nuevo Insumo</button>
+                    </div>
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light"><tr><th>Nombre</th><th>Categoría</th><th>Stock</th><th>Estado</th></tr></thead>
+                        <tbody id="client-inventory-table">
+                            </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="loginModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
-                <div class="modal-header border-0 pb-0">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-5 pt-2 text-center">
-                    <div class="mb-4">
-                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-3">
-                            <i class="bi bi-person-workspace fs-3"></i>
-                        </div>
-                        <h3 class="fw-bold">Bienvenido</h3>
-                        <p class="text-muted">Accede a tu panel corporativo</p>
-                    </div>
-
-                    <button id="btnGoogleLogin" class="google-btn w-100 py-3 rounded-3 mb-4 d-flex align-items-center justify-content-center shadow-sm">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" class="me-2">
-                        Continuar con Google
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-body p-5 text-center">
+                    <h3 class="fw-bold mb-3">Bienvenido</h3>
+                    <button id="btnGoogle" class="google-btn w-100 py-2 mb-3 rounded d-flex align-items-center justify-content-center gap-2">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Iniciar con Google
                     </button>
-
-                    <div class="position-relative mb-4">
-                        <hr class="text-muted">
-                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">o con email</span>
-                    </div>
-
+                    <div class="text-muted small mb-3">- O -</div>
                     <form id="emailLoginForm">
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control rounded-3" id="loginEmail" placeholder="name@example.com" required>
-                            <label>Correo Electrónico</label>
-                        </div>
-                        <div class="form-floating mb-4">
-                            <input type="password" class="form-control rounded-3" id="loginPass" placeholder="Password" required>
-                            <label>Contraseña</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow">
-                            Iniciar Sesión
-                        </button>
+                        <input type="email" id="loginEmail" class="form-control mb-2" placeholder="Email" required>
+                        <input type="password" id="loginPass" class="form-control mb-3" placeholder="Contraseña" required>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Entrar</button>
                     </form>
                 </div>
-                <div class="modal-footer justify-content-center bg-light border-0 py-3">
-                    <small class="text-muted">¿No tienes cuenta? <a href="#pricing" class="fw-bold text-decoration-none" onclick="bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide()">Ver planes</a></small>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createCompanyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Registrar Empresa</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form id="createCompanyForm">
+                        <div class="mb-2"><label class="small fw-bold">Nombre Empresa</label><input type="text" id="cc-name" class="form-control" required></div>
+                        <div class="mb-2"><label class="small fw-bold">Email Admin</label><input type="email" id="cc-email" class="form-control" required></div>
+                        <div class="mb-2"><label class="small fw-bold">Contraseña</label><input type="text" id="cc-pass" class="form-control" minlength="6" required></div>
+                        <div class="mb-3"><label class="small fw-bold">Plan</label><select id="cc-plan" class="form-select"><option value="Basic">Basic ($10)</option><option value="Pro">Pro ($25)</option><option value="Business">Business ($40)</option></select></div>
+                        <button type="submit" class="btn btn-primary w-100">Crear Cliente</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module">
-        import { login, loginWithGoogle } from './auth.js';
 
-        // Funciones Globales para el HTML
-        window.startDemo = () => {
-            const demoUser = { 
-                role: 'DEMO', 
-                companyId: 'DEMO_CORP', 
-                name: 'Usuario Demo',
-                isDemo: true,
-                demoExpires: new Date(new Date().getTime() + (14 * 24 * 60 * 60 * 1000))
-            };
-            localStorage.setItem('user_data', JSON.stringify(demoUser));
-            localStorage.setItem('branding_name', 'Demo Corporation');
-            window.location.href = 'app.html';
+    <script type="module">
+        // --- 1. FIREBASE CONFIG & INIT ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, query, where, orderBy, serverTimestamp, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5pUM_BycmKkbfhreDUrUH5CJEg_ykUW4",
+            authDomain: "proyectocoorporativo.firebaseapp.com",
+            projectId: "proyectocoorporativo",
+            storageBucket: "proyectocoorporativo.firebasestorage.app",
+            messagingSenderId: "152806986808",
+            appId: "1:152806986808:web:6944d32424e27dbf9e82cd"
         };
 
-        // Event Listeners
-        document.getElementById('btnGoogleLogin').addEventListener('click', () => {
-            loginWithGoogle().catch(err => alert("Error: " + err.message));
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // Estado Global
+        let currentUserData = null;
+        let selectedCompanyId = null;
+        let selectedCompanyData = null;
+
+        // --- 2. GESTIÓN DE VISTAS (ROUTER) ---
+        function showView(viewId) {
+            document.querySelectorAll('body > div[id^="view-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        // --- 3. AUTENTICACIÓN ---
+        
+        // Listener de Estado
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Leer datos del usuario
+                try {
+                    const docSnap = await getDoc(doc(db, "users", user.uid));
+                    if (docSnap.exists()) {
+                        currentUserData = docSnap.data();
+                        
+                        // Redirección según rol
+                        if (currentUserData.role === 'SUPER_ADMIN') {
+                            showView('view-super-admin');
+                            initSuperAdminPanel();
+                        } else {
+                            // Verificar bloqueo empresa
+                            const compSnap = await getDoc(doc(db, "companies", currentUserData.companyId));
+                            if (compSnap.exists() && compSnap.data().status === 'blocked') {
+                                alert("ACCESO DENEGADO: Cuenta suspendida por falta de pago.");
+                                window.logout();
+                                return;
+                            }
+                            // Iniciar Panel Cliente
+                            showView('view-client-app');
+                            initClientPanel(compSnap.data().name);
+                        }
+                    } else {
+                        // Usuario autenticado pero sin registro en DB (posible primer login Super Admin si se creó manual)
+                        console.log("Usuario sin perfil DB. Saliendo...");
+                        window.logout();
+                    }
+                } catch (e) { console.error(e); }
+            } else {
+                // No autenticado
+                showView('view-landing');
+            }
         });
 
-        document.getElementById('emailLoginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
-            login(email, pass);
+        window.logout = () => signOut(auth).then(() => location.reload());
+        
+        window.showLoginModal = () => new bootstrap.Modal(document.getElementById('loginModal')).show();
+
+        // Login Actions
+        document.getElementById('btnGoogle').addEventListener('click', async () => {
+            try { await signInWithPopup(auth, provider); bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide(); } 
+            catch (e) { alert(e.message); }
         });
+
+        document.getElementById('emailLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try { 
+                await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPass').value);
+                bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+            } catch (e) { alert("Error: " + e.message); }
+        });
+
+        window.startDemo = () => {
+            // Demo User Mock
+            showView('view-client-app');
+            initClientPanel("Demo Corp (Prueba)");
+        };
+
+        // --- 4. LÓGICA SUPER ADMIN ---
+
+        window.showCreateCompanyModal = () => new bootstrap.Modal(document.getElementById('createCompanyModal')).show();
+
+        // Crear Empresa (Con truco de App Secundaria para no desloguear)
+        document.getElementById('createCompanyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true; btn.innerText = "Creando...";
+
+            const name = document.getElementById('cc-name').value;
+            const email = document.getElementById('cc-email').value;
+            const pass = document.getElementById('cc-pass').value;
+            const plan = document.getElementById('cc-plan').value;
+
+            try {
+                // 1. Crear usuario en Auth (App secundaria)
+                const secApp = initializeApp(firebaseConfig, "Secondary");
+                const secAuth = getAuth(secApp);
+                const uCred = await createUserWithEmailAndPassword(secAuth, email, pass);
+                await signOut(secAuth); // Cerrar sesión secundaria
+
+                // 2. Guardar en Firestore
+                const compRef = await addDoc(collection(db, "companies"), {
+                    name, plan, status: 'active', createdAt: serverTimestamp()
+                });
+
+                await setDoc(doc(db, "users", uCred.user.uid), {
+                    email, role: 'COMPANY_ADMIN', companyId: compRef.id, name: "Admin " + name, passHint: pass
+                });
+
+                alert("Empresa creada con éxito.");
+                bootstrap.Modal.getInstance(document.getElementById('createCompanyModal')).hide();
+                e.target.reset();
+                initSuperAdminPanel(); // Recargar lista
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false; btn.innerText = "Crear Cliente";
+            }
+        });
+
+        // Cargar Lista Empresas
+        async function initSuperAdminPanel() {
+            const snap = await getDocs(collection(db, "companies"));
+            const list = document.getElementById('sa-company-list');
+            list.innerHTML = "";
+            
+            // Guardamos referencia global
+            window.allCompanies = [];
+            
+            snap.forEach(doc => {
+                const d = doc.data();
+                const id = doc.id;
+                window.allCompanies.push({id, ...d});
+                
+                list.innerHTML += `
+                    <div class="company-item d-flex justify-content-between align-items-center" onclick="window.selectCompany('${id}')">
+                        <div>
+                            <div class="fw-bold">${d.name}</div>
+                            <small class="text-muted">${d.plan} • <span class="badge ${d.status==='active'?'bg-success':'bg-danger'} p-1 rounded-circle" style="width:10px;height:10px;display:inline-block"></span></small>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>`;
+            });
+        }
+
+        // Seleccionar Empresa
+        window.selectCompany = async (id) => {
+            selectedCompanyId = id;
+            selectedCompanyData = window.allCompanies.find(c => c.id === id);
+            
+            document.getElementById('sa-empty-state').classList.add('hidden');
+            document.getElementById('sa-company-detail').classList.remove('hidden');
+            
+            // Header
+            document.getElementById('sa-detail-name').innerText = selectedCompanyData.name;
+            document.getElementById('sa-detail-id').innerText = "ID: " + id;
+            document.getElementById('sa-detail-plan').innerText = selectedCompanyData.plan;
+            
+            const badge = document.getElementById('sa-detail-status');
+            const btnBlock = document.getElementById('sa-btn-block');
+            
+            if(selectedCompanyData.status === 'active') {
+                badge.className = "badge bg-success mt-1"; badge.innerText = "ACTIVO";
+                btnBlock.className = "btn btn-danger"; btnBlock.innerHTML = '<i class="bi bi-slash-circle"></i> Bloquear';
+                btnBlock.onclick = () => toggleStatus(id, 'active');
+            } else {
+                badge.className = "badge bg-danger mt-1"; badge.innerText = "BLOQUEADO";
+                btnBlock.className = "btn btn-success"; btnBlock.innerHTML = '<i class="bi bi-check-circle"></i> Reactivar';
+                btnBlock.onclick = () => toggleStatus(id, 'blocked');
+            }
+
+            // Cargar Sub-datos
+            loadCompanyStats(id);
+            loadCompanyPayments(id);
+            loadCompanyUsers(id);
+        };
+
+        async function toggleStatus(id, current) {
+            if(!confirm("¿Cambiar estado de servicio?")) return;
+            const newStatus = current === 'active' ? 'blocked' : 'active';
+            await updateDoc(doc(db, "companies", id), { status: newStatus });
+            // Actualizar local y UI
+            selectedCompanyData.status = newStatus;
+            window.selectCompany(id); // Refrescar vista
+            initSuperAdminPanel(); // Refrescar lista
+        }
+
+        async function loadCompanyStats(id) {
+            // Nota: En producción usar getCountFromServer. Aquí simulamos contando docs.
+            const sSupplies = await getDocs(collection(db, `companies/${id}/supplies`));
+            const sUsers = await getDocs(query(collection(db, "users"), where("companyId", "==", id)));
+            
+            document.getElementById('sa-stat-items').innerText = sSupplies.size;
+            document.getElementById('sa-stat-users').innerText = sUsers.size;
+        }
+
+        async function loadCompanyPayments(id) {
+            const snap = await getDocs(query(collection(db, `companies/${id}/payments`), orderBy("date", "desc")));
+            let total = 0;
+            const tbody = document.getElementById('sa-payments-table');
+            tbody.innerHTML = "";
+            snap.forEach(doc => {
+                const p = doc.data();
+                total += p.amount;
+                tbody.innerHTML += `<tr><td>${new Date(p.date.seconds*1000).toLocaleDateString()}</td><td class="fw-bold text-success">$${p.amount}</td><td>${p.method}</td></tr>`;
+            });
+            document.getElementById('sa-stat-rev').innerText = "$" + total;
+        }
+
+        async function loadCompanyUsers(id) {
+            const snap = await getDocs(query(collection(db, "users"), where("companyId", "==", id)));
+            const tbody = document.getElementById('sa-users-table');
+            tbody.innerHTML = "";
+            snap.forEach(doc => {
+                const u = doc.data();
+                tbody.innerHTML += `<tr><td>${u.name}</td><td>${u.email}</td><td><span class="badge bg-secondary">${u.role}</span></td></tr>`;
+            });
+        }
+
+        // Registrar Pago
+        document.getElementById('sa-payment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!selectedCompanyId) return;
+            await addDoc(collection(db, `companies/${selectedCompanyId}/payments`), {
+                amount: parseFloat(document.getElementById('pay-amount').value),
+                method: document.getElementById('pay-method').value,
+                date: serverTimestamp()
+            });
+            e.target.reset();
+            loadCompanyPayments(selectedCompanyId);
+            alert("Pago registrado");
+        });
+
+        // Exportar XLS Admin
+        window.downloadReportAdmin = async () => {
+            if(!selectedCompanyId) return;
+            const data = await getSuppliesData(selectedCompanyId);
+            exportToExcel(data, `Reporte_${selectedCompanyData.name}`);
+        };
+
+
+        // --- 5. LÓGICA CLIENTE (APP) ---
+
+        async function initClientPanel(companyName) {
+            document.getElementById('app-company-name').innerText = companyName;
+            document.getElementById('app-user-email').innerText = currentUserData?.email || "demo@user.com";
+            
+            if(currentUserData?.role === 'DEMO') {
+                // Datos Falsos Demo
+                renderClientInventory([
+                    {name:'Laptop Dell', category:'IT', stock:10},
+                    {name:'Silla Erg', category:'Mobiliario', stock:2}
+                ]);
+            } else {
+                // Datos Reales
+                const data = await getSuppliesData(currentUserData.companyId);
+                renderClientInventory(data);
+            }
+        }
+
+        async function getSuppliesData(compId) {
+            const snap = await getDocs(collection(db, `companies/${compId}/supplies`));
+            return snap.docs.map(d => d.data());
+        }
+
+        function renderClientInventory(list) {
+            const tbody = document.getElementById('client-inventory-table');
+            tbody.innerHTML = "";
+            let lowStock = 0;
+            
+            list.forEach(item => {
+                if(item.stock < 5) lowStock++;
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="fw-bold">${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.stock}</td>
+                        <td>${item.stock < 5 ? '<span class="badge bg-danger">BAJO</span>' : '<span class="badge bg-success">OK</span>'}</td>
+                    </tr>`;
+            });
+
+            document.getElementById('client-stat-total').innerText = list.length;
+            document.getElementById('client-stat-low').innerText = lowStock;
+            
+            // Guardar para exportar
+            window.clientDataForExport = list;
+        }
+
+        window.downloadReportClient = () => {
+            const name = currentUserData?.role === 'DEMO' ? 'DemoCorp' : document.getElementById('app-company-name').innerText;
+            exportToExcel(window.clientDataForExport || [], `Inventario_${name}`);
+        };
+
+        // Utilidad Excel
+        function exportToExcel(data, filename) {
+            let html = `<table border="1"><thead><tr style="background:#4f46e5;color:white"><th>Item</th><th>Cat</th><th>Stock</th></tr></thead><tbody>`;
+            data.forEach(r => html += `<tr><td>${r.name}</td><td>${r.category}</td><td>${r.stock}</td></tr>`);
+            html += `</tbody></table>`;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([html], {type:'application/vnd.ms-excel'}));
+            a.download = filename + '.xls';
+            a.click();
+        }
+
+        // Buscador
+        document.getElementById('sa-search').addEventListener('keyup', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('.company-item').forEach(el => {
+                el.style.display = el.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
+            });
+        });
+
     </script>
 </body>
 </html>
