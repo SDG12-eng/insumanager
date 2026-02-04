@@ -1,75 +1,52 @@
-import { db } from './firebase.js';
-import { collection, addDoc, getDocs, doc, updateDoc, setDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// ... (Mantén todo lo anterior: imports, createCompany, getCompanies, etc.)
 
-// --- SUPER ADMIN: Gestión de Empresas ---
-export async function createCompany(data) {
-    // Crear empresa
-    const compRef = await addDoc(collection(db, "companies"), {
-        name: data.name,
-        plan: data.plan,
-        status: 'active', // active | blocked
-        createdAt: serverTimestamp()
-    });
+// --- NUEVAS FUNCIONES PARA EL SUPER ADMIN ---
 
-    // Crear Admin de la empresa automáticamente
-    const adminUid = `admin_${compRef.id}`; // Simulado para el ejemplo
-    await setDoc(doc(db, "users", adminUid), {
-        email: data.adminEmail,
-        role: 'COMPANY_ADMIN',
-        companyId: compRef.id,
-        name: "Admin " + data.name
-    });
-    
-    // (Nota: En prod, aquí usarías Cloud Functions para crear el Auth real)
-    return compRef.id;
-}
-
-export async function toggleCompanyStatus(companyId, currentStatus) {
-    const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
-    await updateDoc(doc(db, "companies", companyId), { status: newStatus });
-    return newStatus;
-}
-
-export async function getCompanies() {
-    const snap = await getDocs(collection(db, "companies"));
+// 1. Obtener usuarios de una empresa específica
+export async function getUsersByCompany(companyId) {
+    const q = query(collection(db, "users"), where("companyId", "==", companyId));
+    const snap = await getDocs(q);
     return snap.docs.map(d => ({id: d.id, ...d.data()}));
 }
 
-// --- EMPRESA: Insumos ---
-export async function getSupplies(companyId) {
-    const q = query(collection(db, `companies/${companyId}/supplies`));
-    const snap = await getDocs(q);
-    return snap.docs.map(d => d.data());
-}
-
-// --- UTILIDAD: Exportar a XLS ---
-export function exportToXLS(data, filename) {
-    let html = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-        <head><meta charset="UTF-8"></head><body>
-        <table border="1">
-            <thead>
-                <tr style="background-color: #4f46e5; color: white;">
-                    <th>NOMBRE</th><th>CATEGORÍA</th><th>STOCK</th><th>ESTADO</th>
-                </tr>
-            </thead>
-            <tbody>`;
-    
-    data.forEach(row => {
-        html += `<tr>
-            <td>${row.name}</td>
-            <td>${row.category}</td>
-            <td>${row.stock}</td>
-            <td>${row.stock < 5 ? 'BAJO' : 'NORMAL'}</td>
-        </tr>`;
+// 2. Registrar un pago manual (SaaS)
+export async function addPayment(companyId, amount, method) {
+    await addDoc(collection(db, `companies/${companyId}/payments`), {
+        amount: parseFloat(amount),
+        date: serverTimestamp(),
+        method: method, // 'Transferencia', 'Stripe', 'Efectivo'
+        status: 'paid'
     });
-
-    html += `</tbody></table></body></html>`;
-    
-    const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${filename}.xls`;
-    a.click();
+    // Opcional: Extender fecha de vencimiento aquí si tuvieras lógica de fechas
 }
+
+// 3. Obtener historial de pagos de una empresa
+export async function getCompanyPayments(companyId) {
+    const q = query(collection(db, `companies/${companyId}/payments`), orderBy("date", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => {
+        const data = d.data();
+        return {
+            id: d.id,
+            ...data,
+            // Convertir timestamp a fecha legible si existe, si no usar fecha actual
+            formattedDate: data.date ? new Date(data.date.seconds * 1000).toLocaleDateString() : new Date().toLocaleDateString()
+        };
+    });
+}
+
+// 4. Obtener Estadísticas Rápidas de una empresa (Para el "Muestreo de Panel")
+export async function getCompanyStats(companyId) {
+    // Nota: Leer todos los docs puede ser costoso en producción real.
+    // Para MVP está bien. En prod usar contadores agregados.
+    const suppliesSnap = await getCountFromServer(query(collection(db, `companies/${companyId}/supplies`)));
+    const usersSnap = await getCountFromServer(query(collection(db, "users"), where("companyId", "==", companyId)));
+    
+    return {
+        supplies: suppliesSnap.data().count,
+        users: usersSnap.data().count
+    };
+}
+
+// Importar getCountFromServer al inicio de db.js si no está:
+import { getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
