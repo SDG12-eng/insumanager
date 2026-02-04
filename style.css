@@ -1,17 +1,14 @@
-:root { --primary: #0d6efd; --bg-light: #f8f9fa; }
-body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f0f2f5; color: #343a40; }
-
-/* LANDING PAGE STYLES */
-.hero-section { background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); color: white; padding: 100px 0; }
-.pricing-card { transition: transform 0.3s; }
-.pricing-card:hover { transform: translateY(-10px); }
-
-/* APP STYLES */
-.pointer { cursor: pointer; }
-.scroll-area { max-height: 400px; overflow-y: auto; scrollbar-width: thin; }
-.content-section { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
-.card { border-radius: 12px; transition: transform 0.2s; }
-.dyn-input { border-left: 4px solid #0d6efd; background-color: #fff; }
-canvas.signature-pad { border: 2px dashed #adb5bd; border-radius: 8px; background: #fff; width: 100%; height: 160px; touch-action: none; }
-.perm-check { transform: scale(1.1); margin-right: 5px; margin-left: 10px; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+#wrapper { display: flex; width: 100%; }
+#sidebar-wrapper { min-height: 100vh; margin-left: -15rem; transition: margin 0.25s ease-out; }
+#sidebar-wrapper .sidebar-heading { padding: 0.875rem 1.25rem; font-size: 1.2rem; }
+#sidebar-wrapper .list-group { width: 15rem; }
+#page-content-wrapper { width: 100%; }
+body.sb-sidenav-toggled #sidebar-wrapper { margin-left: 0; }
+@media (min-width: 768px) {
+  #sidebar-wrapper { margin-left: 0; }
+  #page-content-wrapper { min-width: 0; width: 100%; }
+  body.sb-sidenav-toggled #sidebar-wrapper { margin-left: -15rem; }
+}
+.card { border-radius: 12px; }
+.btn { border-radius: 8px; }
