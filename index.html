@@ -29,7 +29,7 @@
         
         /* Super Admin Layout Especial */
         .master-layout { display: flex; height: 100vh; overflow: hidden; }
-        .sa-sidebar { width: 350px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; overflow-y: auto; }
+        .sa-sidebar { width: 350px; background: white; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; overflow-y: auto; z-index: 100; }
         .sa-content { flex: 1; background: #f3f4f6; overflow-y: auto; padding: 30px; }
         .company-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: 0.2s; }
         .company-item:hover { background-color: #f9fafb; }
@@ -38,8 +38,13 @@
         /* Utilidades */
         .google-btn { background: white; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; transition: 0.2s; }
         .google-btn:hover { background: #f8fafc; }
-        .badge-status-active { background-color: #10b981; color: white; }
-        .badge-status-blocked { background-color: #ef4444; color: white; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar, .sa-sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .main-content, .sa-content { margin-left: 0; width: 100%; }
+            .sidebar.show, .sa-sidebar.show { transform: translateX(0); }
+        }
     </style>
 </head>
 <body>
@@ -107,12 +112,12 @@
                 </div>
             </div>
         </section>
-
-        <section id="contact" class="py-5 bg-white">
-            <div class="container py-5 text-center">
-                <h2>¿Necesitas ayuda?</h2>
-                <p class="text-muted">Nuestro equipo de soporte está listo para asistirte.</p>
-                <button class="btn btn-primary rounded-pill px-5">Contactar Soporte</button>
+        
+        <section class="py-5 bg-white text-center">
+            <div class="container">
+                <h3>Contacto Enterprise</h3>
+                <p>Para grandes volúmenes, contáctanos directamente.</p>
+                <button class="btn btn-primary rounded-pill px-5">Contactar Ventas</button>
             </div>
         </section>
     </div>
@@ -130,7 +135,7 @@
                 <input type="text" id="sa-search" class="form-control form-control-sm" placeholder="Buscar cliente...">
             </div>
             <div id="sa-company-list">
-                <div class="text-center p-4 text-muted small">Cargando...</div>
+                <div class="text-center p-4 text-muted small">Cargando empresas...</div>
             </div>
         </div>
 
@@ -212,7 +217,7 @@
             </ul>
             <hr>
             <div class="d-flex align-items-center justify-content-between">
-                <small class="text-muted" id="app-user-email">user@mail.com</small>
+                <small class="text-muted text-truncate" id="app-user-email" style="max-width: 150px;">user@mail.com</small>
                 <button onclick="window.logout()" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i></button>
             </div>
         </div>
@@ -231,7 +236,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-end mb-3">
-                        <button class="btn btn-primary" onclick="alert('Función crear insumo')">+ Nuevo Insumo</button>
+                        <button class="btn btn-primary" onclick="alert('Funcionalidad Demo: Crear Insumo')">+ Nuevo Insumo</button>
                     </div>
                     <table class="table table-hover align-middle">
                         <thead class="table-light"><tr><th>Nombre</th><th>Categoría</th><th>Stock</th><th>Estado</th></tr></thead>
@@ -248,14 +253,14 @@
             <div class="modal-content border-0 shadow rounded-4">
                 <div class="modal-body p-5 text-center">
                     <h3 class="fw-bold mb-3">Bienvenido</h3>
-                    <button id="btnGoogle" class="google-btn w-100 py-2 mb-3 rounded d-flex align-items-center justify-content-center gap-2">
+                    <button id="btnGoogle" class="google-btn w-100 py-3 mb-3 rounded d-flex align-items-center justify-content-center gap-2">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Iniciar con Google
                     </button>
                     <div class="text-muted small mb-3">- O -</div>
                     <form id="emailLoginForm">
-                        <input type="email" id="loginEmail" class="form-control mb-2" placeholder="Email" required>
-                        <input type="password" id="loginPass" class="form-control mb-3" placeholder="Contraseña" required>
-                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Entrar</button>
+                        <input type="email" id="loginEmail" class="form-control mb-2 py-2" placeholder="Email" required>
+                        <input type="password" id="loginPass" class="form-control mb-3 py-2" placeholder="Contraseña" required>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2">Entrar</button>
                     </form>
                 </div>
             </div>
@@ -287,6 +292,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, query, where, orderBy, serverTimestamp, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // CONFIGURACIÓN DE TU PROYECTO
         const firebaseConfig = {
             apiKey: "AIzaSyA5pUM_BycmKkbfhreDUrUH5CJEg_ykUW4",
             authDomain: "proyectocoorporativo.firebaseapp.com",
@@ -314,48 +320,42 @@
 
         // --- 3. AUTENTICACIÓN ---
         
-        // Listener de Estado
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Leer datos del usuario
                 try {
                     const docSnap = await getDoc(doc(db, "users", user.uid));
                     if (docSnap.exists()) {
                         currentUserData = docSnap.data();
                         
-                        // Redirección según rol
                         if (currentUserData.role === 'SUPER_ADMIN') {
                             showView('view-super-admin');
                             initSuperAdminPanel();
                         } else {
-                            // Verificar bloqueo empresa
                             const compSnap = await getDoc(doc(db, "companies", currentUserData.companyId));
-                            if (compSnap.exists() && compSnap.data().status === 'blocked') {
-                                alert("ACCESO DENEGADO: Cuenta suspendida por falta de pago.");
-                                window.logout();
-                                return;
+                            if (compSnap.exists()) {
+                                if (compSnap.data().status === 'blocked') {
+                                    alert("ACCESO DENEGADO: Cuenta suspendida.");
+                                    window.logout();
+                                    return;
+                                }
+                                showView('view-client-app');
+                                initClientPanel(compSnap.data().name);
                             }
-                            // Iniciar Panel Cliente
-                            showView('view-client-app');
-                            initClientPanel(compSnap.data().name);
                         }
                     } else {
-                        // Usuario autenticado pero sin registro en DB (posible primer login Super Admin si se creó manual)
-                        console.log("Usuario sin perfil DB. Saliendo...");
+                        // Usuario no existe en DB, logout para evitar limbos
+                        console.log("Usuario sin registro DB");
                         window.logout();
                     }
                 } catch (e) { console.error(e); }
             } else {
-                // No autenticado
                 showView('view-landing');
             }
         });
 
         window.logout = () => signOut(auth).then(() => location.reload());
-        
         window.showLoginModal = () => new bootstrap.Modal(document.getElementById('loginModal')).show();
 
-        // Login Actions
         document.getElementById('btnGoogle').addEventListener('click', async () => {
             try { await signInWithPopup(auth, provider); bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide(); } 
             catch (e) { alert(e.message); }
@@ -370,16 +370,16 @@
         });
 
         window.startDemo = () => {
-            // Demo User Mock
+            // Lógica Demo sin redirección externa
+            currentUserData = { role: 'DEMO', companyId: 'DEMO_CORP', email: 'demo@user.com' };
             showView('view-client-app');
-            initClientPanel("Demo Corp (Prueba)");
+            initClientPanel("Demo Corporation");
         };
 
         // --- 4. LÓGICA SUPER ADMIN ---
 
         window.showCreateCompanyModal = () => new bootstrap.Modal(document.getElementById('createCompanyModal')).show();
 
-        // Crear Empresa (Con truco de App Secundaria para no desloguear)
         document.getElementById('createCompanyForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
@@ -391,25 +391,20 @@
             const plan = document.getElementById('cc-plan').value;
 
             try {
-                // 1. Crear usuario en Auth (App secundaria)
+                // Truco App Secundaria para no cerrar sesión al crear usuario
                 const secApp = initializeApp(firebaseConfig, "Secondary");
                 const secAuth = getAuth(secApp);
                 const uCred = await createUserWithEmailAndPassword(secAuth, email, pass);
-                await signOut(secAuth); // Cerrar sesión secundaria
+                await signOut(secAuth); 
 
-                // 2. Guardar en Firestore
-                const compRef = await addDoc(collection(db, "companies"), {
-                    name, plan, status: 'active', createdAt: serverTimestamp()
-                });
-
-                await setDoc(doc(db, "users", uCred.user.uid), {
-                    email, role: 'COMPANY_ADMIN', companyId: compRef.id, name: "Admin " + name, passHint: pass
-                });
+                // Guardar en Firestore
+                const compRef = await addDoc(collection(db, "companies"), { name, plan, status: 'active', createdAt: serverTimestamp() });
+                await setDoc(doc(db, "users", uCred.user.uid), { email, role: 'COMPANY_ADMIN', companyId: compRef.id, name: "Admin " + name, passHint: pass });
 
                 alert("Empresa creada con éxito.");
                 bootstrap.Modal.getInstance(document.getElementById('createCompanyModal')).hide();
                 e.target.reset();
-                initSuperAdminPanel(); // Recargar lista
+                initSuperAdminPanel();
             } catch (err) {
                 alert("Error: " + err.message);
             } finally {
@@ -417,32 +412,26 @@
             }
         });
 
-        // Cargar Lista Empresas
         async function initSuperAdminPanel() {
             const snap = await getDocs(collection(db, "companies"));
             const list = document.getElementById('sa-company-list');
             list.innerHTML = "";
-            
-            // Guardamos referencia global
             window.allCompanies = [];
             
             snap.forEach(doc => {
                 const d = doc.data();
-                const id = doc.id;
-                window.allCompanies.push({id, ...d});
-                
+                window.allCompanies.push({id: doc.id, ...d});
                 list.innerHTML += `
-                    <div class="company-item d-flex justify-content-between align-items-center" onclick="window.selectCompany('${id}')">
+                    <div class="company-item d-flex justify-content-between align-items-center" onclick="window.selectCompany('${doc.id}')">
                         <div>
                             <div class="fw-bold">${d.name}</div>
-                            <small class="text-muted">${d.plan} • <span class="badge ${d.status==='active'?'bg-success':'bg-danger'} p-1 rounded-circle" style="width:10px;height:10px;display:inline-block"></span></small>
+                            <small class="text-muted">${d.plan} • <span class="badge ${d.status==='active'?'badge-status-active':'badge-status-blocked'} p-1 rounded-circle" style="width:10px;height:10px;display:inline-block"></span></small>
                         </div>
                         <i class="bi bi-chevron-right text-muted"></i>
                     </div>`;
             });
         }
 
-        // Seleccionar Empresa
         window.selectCompany = async (id) => {
             selectedCompanyId = id;
             selectedCompanyData = window.allCompanies.find(c => c.id === id);
@@ -450,7 +439,6 @@
             document.getElementById('sa-empty-state').classList.add('hidden');
             document.getElementById('sa-company-detail').classList.remove('hidden');
             
-            // Header
             document.getElementById('sa-detail-name').innerText = selectedCompanyData.name;
             document.getElementById('sa-detail-id').innerText = "ID: " + id;
             document.getElementById('sa-detail-plan').innerText = selectedCompanyData.plan;
@@ -468,7 +456,6 @@
                 btnBlock.onclick = () => toggleStatus(id, 'blocked');
             }
 
-            // Cargar Sub-datos
             loadCompanyStats(id);
             loadCompanyPayments(id);
             loadCompanyUsers(id);
@@ -478,19 +465,18 @@
             if(!confirm("¿Cambiar estado de servicio?")) return;
             const newStatus = current === 'active' ? 'blocked' : 'active';
             await updateDoc(doc(db, "companies", id), { status: newStatus });
-            // Actualizar local y UI
             selectedCompanyData.status = newStatus;
-            window.selectCompany(id); // Refrescar vista
-            initSuperAdminPanel(); // Refrescar lista
+            window.selectCompany(id); 
+            initSuperAdminPanel();
         }
 
         async function loadCompanyStats(id) {
-            // Nota: En producción usar getCountFromServer. Aquí simulamos contando docs.
-            const sSupplies = await getDocs(collection(db, `companies/${id}/supplies`));
-            const sUsers = await getDocs(query(collection(db, "users"), where("companyId", "==", id)));
-            
-            document.getElementById('sa-stat-items').innerText = sSupplies.size;
-            document.getElementById('sa-stat-users').innerText = sUsers.size;
+            try {
+                const sSupplies = await getCountFromServer(query(collection(db, `companies/${id}/supplies`)));
+                const sUsers = await getCountFromServer(query(collection(db, "users"), where("companyId", "==", id)));
+                document.getElementById('sa-stat-items').innerText = sSupplies.data().count;
+                document.getElementById('sa-stat-users').innerText = sUsers.data().count;
+            } catch(e) { console.log(e); }
         }
 
         async function loadCompanyPayments(id) {
@@ -501,7 +487,7 @@
             snap.forEach(doc => {
                 const p = doc.data();
                 total += p.amount;
-                tbody.innerHTML += `<tr><td>${new Date(p.date.seconds*1000).toLocaleDateString()}</td><td class="fw-bold text-success">$${p.amount}</td><td>${p.method}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${p.date ? new Date(p.date.seconds*1000).toLocaleDateString() : '-'}</td><td class="fw-bold text-success">$${p.amount}</td><td>${p.method}</td></tr>`;
             });
             document.getElementById('sa-stat-rev').innerText = "$" + total;
         }
@@ -512,11 +498,10 @@
             tbody.innerHTML = "";
             snap.forEach(doc => {
                 const u = doc.data();
-                tbody.innerHTML += `<tr><td>${u.name}</td><td>${u.email}</td><td><span class="badge bg-secondary">${u.role}</span></td></tr>`;
+                tbody.innerHTML += `<tr><td>${u.name}</td><td>${u.email}</td><td><span class="badge bg-secondary">${u.role}</span><br><small class="text-muted">${u.passHint || ''}</small></td></tr>`;
             });
         }
 
-        // Registrar Pago
         document.getElementById('sa-payment-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!selectedCompanyId) return;
@@ -530,31 +515,25 @@
             alert("Pago registrado");
         });
 
-        // Exportar XLS Admin
         window.downloadReportAdmin = async () => {
             if(!selectedCompanyId) return;
             const data = await getSuppliesData(selectedCompanyId);
             exportToExcel(data, `Reporte_${selectedCompanyData.name}`);
         };
 
-
-        // --- 5. LÓGICA CLIENTE (APP) ---
+        // --- 5. LÓGICA CLIENTE ---
 
         async function initClientPanel(companyName) {
             document.getElementById('app-company-name').innerText = companyName;
             document.getElementById('app-user-email').innerText = currentUserData?.email || "demo@user.com";
             
+            let data = [];
             if(currentUserData?.role === 'DEMO') {
-                // Datos Falsos Demo
-                renderClientInventory([
-                    {name:'Laptop Dell', category:'IT', stock:10},
-                    {name:'Silla Erg', category:'Mobiliario', stock:2}
-                ]);
+                data = [{name:'Laptop Dell', category:'IT', stock:10}, {name:'Silla Erg', category:'Mobiliario', stock:2}];
             } else {
-                // Datos Reales
-                const data = await getSuppliesData(currentUserData.companyId);
-                renderClientInventory(data);
+                data = await getSuppliesData(currentUserData.companyId);
             }
+            renderClientInventory(data);
         }
 
         async function getSuppliesData(compId) {
@@ -566,22 +545,12 @@
             const tbody = document.getElementById('client-inventory-table');
             tbody.innerHTML = "";
             let lowStock = 0;
-            
             list.forEach(item => {
                 if(item.stock < 5) lowStock++;
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="fw-bold">${item.name}</td>
-                        <td>${item.category}</td>
-                        <td>${item.stock}</td>
-                        <td>${item.stock < 5 ? '<span class="badge bg-danger">BAJO</span>' : '<span class="badge bg-success">OK</span>'}</td>
-                    </tr>`;
+                tbody.innerHTML += `<tr><td class="fw-bold">${item.name}</td><td>${item.category}</td><td>${item.stock}</td><td>${item.stock < 5 ? '<span class="badge bg-danger">BAJO</span>' : '<span class="badge bg-success">OK</span>'}</td></tr>`;
             });
-
             document.getElementById('client-stat-total').innerText = list.length;
             document.getElementById('client-stat-low').innerText = lowStock;
-            
-            // Guardar para exportar
             window.clientDataForExport = list;
         }
 
@@ -590,7 +559,6 @@
             exportToExcel(window.clientDataForExport || [], `Inventario_${name}`);
         };
 
-        // Utilidad Excel
         function exportToExcel(data, filename) {
             let html = `<table border="1"><thead><tr style="background:#4f46e5;color:white"><th>Item</th><th>Cat</th><th>Stock</th></tr></thead><tbody>`;
             data.forEach(r => html += `<tr><td>${r.name}</td><td>${r.category}</td><td>${r.stock}</td></tr>`);
@@ -601,14 +569,12 @@
             a.click();
         }
 
-        // Buscador
         document.getElementById('sa-search').addEventListener('keyup', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.company-item').forEach(el => {
                 el.style.display = el.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
             });
         });
-
     </script>
 </body>
 </html>
