@@ -2,101 +2,363 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Super Admin | SaaS Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Corp</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; }
+        
+        /* Layout */
+        .master-layout { display: flex; height: 100vh; }
+        
+        /* Sidebar Izquierdo (Lista Empresas) */
+        .sidebar-list {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+        .search-box { padding: 15px; border-bottom: 1px solid #f0f0f0; background: #fafafa; }
+        .company-list { overflow-y: auto; flex-grow: 1; }
+        .company-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .company-item:hover { background-color: #f9fafb; }
+        .company-item.active { background-color: #eef2ff; border-left: 4px solid #4f46e5; }
+        
+        /* Panel Derecho (Detalles) */
+        .detail-view { flex-grow: 1; overflow-y: auto; padding: 30px; background: #f8fafc; }
+        
+        /* Cards */
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card-header-tabs { margin-bottom: -1px; }
+        
+        /* Estados */
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .dot-active { background-color: #10b981; }
+        .dot-blocked { background-color: #ef4444; }
+    </style>
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark px-4">
-        <span class="navbar-brand mb-0 h1">🛠️ ADMIN MAESTRO SaaS</span>
-        <button id="logoutBtn" class="btn btn-outline-danger btn-sm">Cerrar Sesión</button>
-    </nav>
+<body>
 
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card shadow-sm p-3">
-                    <h5>Nueva Empresa Cliente</h5>
-                    <form id="createCompanyForm">
-                        <input type="text" id="cName" class="form-control mb-2" placeholder="Nombre Empresa (Ej: FCI Logistic)" required>
-                        <input type="email" id="cEmail" class="form-control mb-2" placeholder="Email Admin Empresa" required>
-                        <select id="cPlan" class="form-select mb-3">
-                            <option value="Básico">Plan Básico</option>
-                            <option value="Pro">Plan Pro</option>
-                            <option value="Enterprise">Plan Enterprise</option>
-                        </select>
-                        <button class="btn btn-success w-100">Registrar Empresa</button>
-                    </form>
-                </div>
+<div class="master-layout">
+    
+    <div class="sidebar-list">
+        <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+            <h6 class="m-0 fw-bold"><i class="bi bi-command"></i> MASTER PANEL</h6>
+            <button class="btn btn-outline-light btn-sm" id="logoutBtn" title="Salir"><i class="bi bi-power"></i></button>
+        </div>
+        
+        <div class="search-box">
+            <button class="btn btn-primary w-100 mb-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEmpresa">
+                <i class="bi bi-plus-lg"></i> Nueva Empresa
+            </button>
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" id="searchCompany" class="form-control border-start-0" placeholder="Buscar cliente...">
             </div>
+        </div>
 
-            <div class="col-md-8">
-                <div class="card shadow-sm p-3">
-                    <h5>Gestión de Empresas & Pagos</h5>
-                    <table class="table table-hover mt-3 align-middle">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Empresa</th>
-                                <th>Plan</th>
-                                <th>Estado Pago</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="companiesTable"></tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="company-list" id="companyListContainer">
+            <div class="text-center p-4 text-muted">Cargando empresas...</div>
         </div>
     </div>
 
-    <script type="module">
-        import { authGuard, logout } from './auth.js';
-        import { createCompany, getCompanies, toggleCompanyStatus } from './db.js';
+    <div class="detail-view">
+        
+        <div id="emptyState" class="text-center mt-5 pt-5 opacity-50">
+            <i class="bi bi-building display-1"></i>
+            <h3 class="mt-3">Selecciona una empresa</h3>
+            <p>Gestiona usuarios, pagos y reportes desde aquí.</p>
+        </div>
 
-        authGuard('SUPER_ADMIN');
-        document.getElementById('logoutBtn').onclick = logout;
+        <div id="companyDetail" class="d-none">
+            
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-0" id="detailName">Nombre Empresa</h2>
+                    <span class="badge bg-light text-dark border mt-2" id="detailId">ID: ---</span>
+                    <span class="badge bg-primary mt-2" id="detailPlan">Plan ---</span>
+                    <span id="detailStatusBadge" class="badge bg-success mt-2">Activo</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-dark" onclick="downloadReport()"><i class="bi bi-download"></i> Reporte XLS</button>
+                    <button class="btn btn-danger" id="btnBlock" onclick="toggleBlock()"><i class="bi bi-slash-circle"></i> Bloquear Acceso</button>
+                </div>
+            </div>
 
-        async function loadCompanies() {
-            const list = await getCompanies();
-            const tbody = document.getElementById('companiesTable');
-            tbody.innerHTML = list.map(c => `
-                <tr class="${c.status === 'blocked' ? 'table-danger' : ''}">
-                    <td class="fw-bold">${c.name}</td>
-                    <td><span class="badge bg-info">${c.plan}</span></td>
-                    <td>
-                        ${c.status === 'active' 
-                            ? '<span class="badge bg-success">AL DÍA</span>' 
-                            : '<span class="badge bg-danger">MOROSO / BLOQUEADO</span>'}
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-dark" onclick="alert('Gestionar Usuarios de ${c.name}')">Usuarios</button>
-                        <button class="btn btn-sm ${c.status === 'active' ? 'btn-warning' : 'btn-success'}" 
-                                onclick="window.toggleStatus('${c.id}', '${c.status}')">
-                                ${c.status === 'active' ? 'Bloquear Servicio' : 'Reactivar'}
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card border-top border-4 border-primary">
+                        <small class="text-muted fw-bold">USUARIOS ACTIVOS</small>
+                        <h3 class="fw-bold mt-1" id="statUsers">0</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card border-top border-4 border-success">
+                        <small class="text-muted fw-bold">ITEMS EN STOCK</small>
+                        <h3 class="fw-bold mt-1" id="statSupplies">0</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card border-top border-4 border-warning">
+                        <small class="text-muted fw-bold">PAGOS TOTALES</small>
+                        <h3 class="fw-bold mt-1" id="statRevenue">$0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <ul class="nav nav-tabs card-header-tabs" id="mgmtTabs">
+                        <li class="nav-item"><a class="nav-link active" data-bs-target="#tab-users" data-bs-toggle="tab" href="#">👥 Usuarios</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-target="#tab-payments" data-bs-toggle="tab" href="#">💳 Pagos & Facturación</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-target="#tab-config" data-bs-toggle="tab" href="#">⚙️ Configuración</a></li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        
+                        <div class="tab-pane fade show active" id="tab-users">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h6 class="fw-bold">Directorio de Empleados</h6>
+                                <button class="btn btn-sm btn-primary" onclick="alert('Usa el panel de la empresa para crear usuarios operativos.')">Info</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light"><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Acciones</th></tr></thead>
+                                    <tbody id="usersTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab-payments">
+                            <div class="row">
+                                <div class="col-md-4 border-end">
+                                    <h6 class="fw-bold mb-3">Registrar Pago Manual</h6>
+                                    <form id="paymentForm">
+                                        <div class="mb-2"><label class="small">Monto ($USD)</label><input type="number" id="payAmount" class="form-control" required></div>
+                                        <div class="mb-2"><label class="small">Método</label>
+                                            <select id="payMethod" class="form-select">
+                                                <option value="Transferencia">Transferencia</option>
+                                                <option value="Tarjeta">Tarjeta (Stripe/Manual)</option>
+                                                <option value="Efectivo">Efectivo</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100 mt-2">Registrar Pago</button>
+                                    </form>
+                                </div>
+                                <div class="col-md-8 px-4">
+                                    <h6 class="fw-bold mb-3">Historial de Transacciones</h6>
+                                    <table class="table table-sm">
+                                        <thead><tr><th>Fecha</th><th>Monto</th><th>Método</th><th>Estado</th></tr></thead>
+                                        <tbody id="paymentsTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab-config">
+                            <p>Opciones avanzadas de la empresa (Cambiar Plan, Resetear Datos, etc.)</p>
+                            <div class="alert alert-warning">
+                                <strong>Zona de Peligro:</strong> Estas acciones afectan la operación del cliente.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEmpresa" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Nueva Empresa</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="formEmpresa">
+                    <input type="text" id="cName" class="form-control mb-2" placeholder="Nombre Comercial" required>
+                    <input type="text" id="cAdminEmail" class="form-control mb-2" placeholder="Email del Administrador" required>
+                    <select id="cPlan" class="form-select mb-3">
+                        <option value="Básico">Básico ($29)</option>
+                        <option value="Pro">Pro ($79)</option>
+                        <option value="Enterprise">Enterprise (Custom)</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary w-100">Crear y Enviar Accesos</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { logout, authGuard } from './auth.js';
+    import { createCompany, getCompanies, toggleCompanyStatus, getUsersByCompany, addPayment, getCompanyPayments, getCompanyStats, getSupplies, exportToXLS } from './db.js';
+
+    authGuard('SUPER_ADMIN'); // Seguridad
+    document.getElementById('logoutBtn').onclick = logout;
+
+    let currentCompanyId = null;
+    let currentCompanyData = null;
+
+    // 1. CARGAR LISTA LATERAL
+    async function loadSidebar() {
+        const list = await getCompanies();
+        const container = document.getElementById('companyListContainer');
+        const filter = document.getElementById('searchCompany').value.toLowerCase();
+        
+        container.innerHTML = list
+            .filter(c => c.name.toLowerCase().includes(filter))
+            .map(c => `
+            <div class="company-item d-flex justify-content-between align-items-center ${currentCompanyId === c.id ? 'active' : ''}" 
+                 onclick="selectCompany('${c.id}')">
+                <div>
+                    <div class="fw-bold text-dark">${c.name}</div>
+                    <small class="text-muted">${c.plan} • <span class="status-dot ${c.status==='active'?'dot-active':'dot-blocked'}"></span>${c.status}</small>
+                </div>
+                <i class="bi bi-chevron-right text-muted small"></i>
+            </div>
+        `).join('');
+        
+        // Guardar referencia global de datos para usar en otras funciones
+        window.allCompanies = list; 
+    }
+
+    // 2. SELECCIONAR EMPRESA (Detalles)
+    window.selectCompany = async (id) => {
+        currentCompanyId = id;
+        currentCompanyData = window.allCompanies.find(c => c.id === id);
+        
+        // UI Updates
+        loadSidebar(); // Refrescar active class
+        document.getElementById('emptyState').classList.add('d-none');
+        document.getElementById('companyDetail').classList.remove('d-none');
+        
+        // Llenar Header
+        document.getElementById('detailName').innerText = currentCompanyData.name;
+        document.getElementById('detailId').innerText = `ID: ${id}`;
+        document.getElementById('detailPlan').innerText = currentCompanyData.plan;
+        
+        const badge = document.getElementById('detailStatusBadge');
+        const btnBlock = document.getElementById('btnBlock');
+        
+        if(currentCompanyData.status === 'active') {
+            badge.className = 'badge bg-success mt-2'; badge.innerText = 'ACTIVO';
+            btnBlock.innerHTML = '<i class="bi bi-slash-circle"></i> Bloquear Acceso';
+            btnBlock.className = 'btn btn-danger';
+        } else {
+            badge.className = 'badge bg-danger mt-2'; badge.innerText = 'BLOQUEADO';
+            btnBlock.innerHTML = '<i class="bi bi-check-circle"></i> Reactivar Acceso';
+            btnBlock.className = 'btn btn-success';
         }
 
-        window.toggleStatus = async (id, status) => {
-            if(confirm(`¿Estás seguro de cambiar el estado de servicio?`)) {
-                await toggleCompanyStatus(id, status);
-                loadCompanies();
-            }
-        };
+        // Cargar Tabs y Stats
+        loadCompanyUsers(id);
+        loadCompanyPayments(id);
+        loadCompanyStats(id);
+    };
 
-        document.getElementById('createCompanyForm').onsubmit = async (e) => {
-            e.preventDefault();
-            await createCompany({
-                name: document.getElementById('cName').value,
-                adminEmail: document.getElementById('cEmail').value,
-                plan: document.getElementById('cPlan').value
-            });
-            alert("Empresa creada exitosamente");
-            loadCompanies();
-        };
+    // 3. CARGAR USUARIOS
+    async function loadCompanyUsers(id) {
+        const users = await getUsersByCompany(id);
+        document.getElementById('usersTableBody').innerHTML = users.map(u => `
+            <tr>
+                <td class="fw-bold">${u.name || 'Sin nombre'}</td>
+                <td>${u.email}</td>
+                <td><span class="badge bg-secondary">${u.role}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-light border" title="Reset Password" onclick="alert('Se enviará un correo de reseteo a ${u.email}')"><i class="bi bi-key"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
 
-        loadCompanies();
-    </script>
+    // 4. CARGAR PAGOS
+    async function loadCompanyPayments(id) {
+        const payments = await getCompanyPayments(id);
+        const total = payments.reduce((acc, p) => acc + p.amount, 0);
+        document.getElementById('statRevenue').innerText = `$${total.toFixed(2)}`;
+        
+        document.getElementById('paymentsTableBody').innerHTML = payments.map(p => `
+            <tr>
+                <td>${p.formattedDate}</td>
+                <td class="fw-bold text-success">$${p.amount}</td>
+                <td>${p.method}</td>
+                <td><span class="badge bg-success rounded-pill">Pagado</span></td>
+            </tr>
+        `).join('');
+    }
+
+    // 5. CARGAR ESTADÍSTICAS (Muestreo)
+    async function loadCompanyStats(id) {
+        const stats = await getCompanyStats(id);
+        document.getElementById('statSupplies').innerText = stats.supplies;
+        document.getElementById('statUsers').innerText = stats.users;
+    }
+
+    // --- ACCIONES ---
+
+    // Crear Empresa
+    document.getElementById('formEmpresa').onsubmit = async (e) => {
+        e.preventDefault();
+        await createCompany({
+            name: document.getElementById('cName').value,
+            adminEmail: document.getElementById('cAdminEmail').value,
+            plan: document.getElementById('cPlan').value
+        });
+        alert("Empresa creada correctamente.");
+        bootstrap.Modal.getInstance(document.getElementById('modalEmpresa')).hide();
+        loadSidebar();
+    };
+
+    // Registrar Pago
+    document.getElementById('paymentForm').onsubmit = async (e) => {
+        e.preventDefault();
+        if(!currentCompanyId) return;
+        await addPayment(
+            currentCompanyId, 
+            document.getElementById('payAmount').value,
+            document.getElementById('payMethod').value
+        );
+        document.getElementById('paymentForm').reset();
+        loadCompanyPayments(currentCompanyId);
+        alert("Pago registrado.");
+    };
+
+    // Bloquear / Desbloquear
+    window.toggleBlock = async () => {
+        if(!currentCompanyId) return;
+        const action = currentCompanyData.status === 'active' ? 'bloquear' : 'reactivar';
+        if(confirm(`¿Seguro que deseas ${action} a esta empresa?`)) {
+            await toggleCompanyStatus(currentCompanyId, currentCompanyData.status);
+            // Recargar datos localmente simulando refresh
+            currentCompanyData.status = currentCompanyData.status === 'active' ? 'blocked' : 'active';
+            window.selectCompany(currentCompanyId); // Re-render
+        }
+    };
+
+    // Descargar Reporte (Reportería)
+    window.downloadReport = async () => {
+        if(!currentCompanyId) return;
+        const supplies = await getSupplies(currentCompanyId);
+        exportToXLS(supplies, `Reporte_${currentCompanyData.name.replace(/ /g,'_')}`);
+    };
+
+    // Buscador
+    document.getElementById('searchCompany').addEventListener('keyup', loadSidebar);
+
+    // Init
+    loadSidebar();
+
+</script>
 </body>
 </html>
