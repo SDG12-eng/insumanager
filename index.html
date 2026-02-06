@@ -1,46 +1,63 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Enterprise ERP</title>
+    <title>ArchiveMaster Enterprise | ERP & SaaS</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root { --primary: #2563eb; --secondary: #0f172a; --bg-body: #f1f5f9; --surface: #ffffff; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); overflow-x: hidden; }
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #0f172a;
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #334155;
+            --border: #e2e8f0;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: var(--text-main); overflow-x: hidden; }
         .hidden { display: none !important; }
         
-        /* Sidebar & Layout */
-        .sidebar { width: 280px; height: 100vh; position: fixed; background: var(--secondary); color: white; overflow-y: auto; z-index: 1000; transition: 0.3s; }
-        .main-content { margin-left: 280px; padding: 30px; width: calc(100% - 280px); transition: 0.3s; }
+        /* LANDING */
+        .hero-bg { background: radial-gradient(circle at top right, #4f46e5 0%, #1e1b4b 100%); color: white; padding: 100px 0; }
+        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .price-card { border-radius: 1.5rem; border: 1px solid var(--border); transition: 0.3s; background: white; }
+        .price-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .price-card.popular { background: var(--secondary); color: white; border: none; transform: scale(1.05); z-index: 10; }
         
-        .nav-link { color: #94a3b8; border-radius: 8px; margin-bottom: 4px; padding: 10px 15px; }
+        /* APP LAYOUT */
+        .sidebar { width: 280px; height: 100vh; position: fixed; background: var(--secondary); color: white; overflow-y: auto; z-index: 1000; transition: 0.3s; display: flex; flex-direction: column; }
+        .main-content { margin-left: 280px; padding: 30px; width: calc(100% - 280px); transition: 0.3s; min-height: 100vh; }
+        
+        .nav-link { color: #94a3b8; padding: 10px 15px; border-radius: 8px; margin-bottom: 2px; display: flex; align-items: center; transition: 0.2s; }
+        .nav-link i { font-size: 1.1rem; margin-right: 10px; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
-        .nav-group-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin: 20px 0 10px 15px; font-weight: 700; }
+        .nav-group { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin: 25px 0 10px 15px; font-weight: 700; }
 
-        /* Cards & UI */
-        .card { border: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-radius: 12px; }
-        .stat-card { border-left: 4px solid var(--primary); }
-        .btn { border-radius: 8px; font-weight: 500; }
+        /* UI ELEMENTS */
+        .stat-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid var(--border); height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+        .google-btn { background: white; border: 1px solid #cbd5e1; color: #475569; font-weight: 600; transition: 0.2s; }
+        .google-btn:hover { background: #f1f5f9; }
         
-        /* Form Builder Styles */
+        /* SUPER ADMIN */
+        .sa-sidebar { width: 350px; background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; height: 100vh; }
+        .sa-content { flex: 1; background: #f1f5f9; overflow-y: auto; padding: 30px; height: 100vh; }
+        .company-item { padding: 15px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; }
+        .company-item:hover { background: #f8fafc; }
+        .company-item.active { background: #eff6ff; border-left-color: var(--primary); }
+
+        /* FORM BUILDER */
         .builder-field { border: 1px dashed #cbd5e1; padding: 15px; margin-bottom: 10px; background: #f8fafc; border-radius: 8px; position: relative; }
-        .builder-field:hover { border-color: var(--primary); background: #fff; }
         .remove-field { position: absolute; top: 10px; right: 10px; cursor: pointer; color: #ef4444; }
-        
-        /* Signature Canvas */
-        canvas.sig-pad { border: 2px dashed #cbd5e1; border-radius: 8px; cursor: crosshair; background: #fff; width: 100%; }
 
-        /* Landing */
-        .hero-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 100px 0; }
-        
         @media(max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; width: 100%; }
+            .sidebar, .sa-sidebar { transform: translateX(-100%); }
+            .main-content, .sa-content { margin-left: 0; width: 100%; }
             .sidebar.show { transform: translateX(0); }
         }
     </style>
@@ -48,67 +65,148 @@
 <body>
 
     <div id="view-landing">
-        <nav class="navbar navbar-expand-lg fixed-top bg-white border-bottom py-3">
+        <nav class="navbar navbar-expand-lg fixed-top glass-nav py-3">
             <div class="container">
-                <a class="navbar-brand fw-bold text-primary" href="#"><i class="bi bi-grid-3x3-gap-fill me-2"></i>ArchiveMaster ERP</a>
+                <a class="navbar-brand fw-bold text-primary fs-4" href="#"><i class="bi bi-grid-3x3-gap-fill me-2"></i>ArchiveMaster</a>
                 <div class="d-flex gap-2">
-                    <button onclick="window.startDemo()" class="btn btn-outline-dark rounded-pill px-4">Demo</button>
-                    <button onclick="window.showLoginModal()" class="btn btn-primary rounded-pill px-4">Ingresar</button>
+                    <button onclick="window.startDemo()" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Demo</button>
+                    <button onclick="window.showLoginModal()" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Ingresar</button>
                 </div>
             </div>
         </nav>
-        <header class="hero-bg text-center mt-5">
-            <div class="container pt-5">
-                <h1 class="display-4 fw-bold mb-4">Sistema Operativo Integral</h1>
+
+        <header class="hero-bg text-center">
+            <div class="container mt-5 pt-5">
+                <span class="badge bg-white bg-opacity-20 border border-white border-opacity-25 rounded-pill px-3 py-2 mb-4">v3.0 Enterprise ERP</span>
+                <h1 class="display-3 fw-bolder mb-4">Sistema Operativo Integral</h1>
                 <p class="lead text-white-50 mx-auto mb-5" style="max-width: 700px;">Gestión de Insumos, Activos, Tiquetes y Flujos de Trabajo en una sola plataforma multi-empresa.</p>
-                <div class="row justify-content-center g-4 text-dark text-start mt-4">
-                    <div class="col-md-3"><div class="card p-4 h-100"><h5>📦 Inventario</h5><p class="small text-muted">Entradas, salidas y alertas de stock.</p></div></div>
-                    <div class="col-md-3"><div class="card p-4 h-100"><h5>📝 Formularios</h5><p class="small text-muted">Constructor dinámico con firmas y fotos.</p></div></div>
-                    <div class="col-md-3"><div class="card p-4 h-100"><h5>🎫 Tiquetes</h5><p class="small text-muted">Seguimiento de órdenes de trabajo.</p></div></div>
-                </div>
+                <button onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow-lg">Ver Planes</button>
             </div>
         </header>
+
+        <section id="pricing" class="py-5 bg-white">
+            <div class="container py-5">
+                <div class="text-center mb-5"><h2 class="fw-bold">Planes Flexibles</h2></div>
+                <div class="row justify-content-center g-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card price-card p-4 text-center h-100">
+                            <h5 class="fw-bold text-secondary">Basic</h5>
+                            <h2 class="fw-bold my-3">$10<small class="fs-6 text-muted">/mes</small></h2>
+                            <ul class="list-unstyled text-start small mb-4 d-grid gap-2">
+                                <li><i class="bi bi-check text-primary"></i> 1 Empresa</li>
+                                <li><i class="bi bi-check text-primary"></i> 3 Usuarios</li>
+                                <li><i class="bi bi-check text-primary"></i> Inventario Básico</li>
+                            </ul>
+                            <button onclick="window.openRegisterModal('Basic')" class="btn btn-outline-primary w-100 rounded-pill">Elegir</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card price-card popular p-5 text-center">
+                            <span class="badge bg-warning text-dark position-absolute top-0 start-50 translate-middle shadow-sm">RECOMENDADO</span>
+                            <h5 class="fw-bold">Pro</h5>
+                            <h2 class="fw-bold my-3">$25<small class="fs-6 text-white-50">/mes</small></h2>
+                            <ul class="list-unstyled text-start mb-4 d-grid gap-2">
+                                <li><i class="bi bi-check-circle-fill text-warning me-2"></i> Usuarios Ilimitados</li>
+                                <li><i class="bi bi-check-circle-fill text-warning me-2"></i> Form Builder (Activos)</li>
+                                <li><i class="bi bi-check-circle-fill text-warning me-2"></i> Sistema de Tiquetes</li>
+                                <li><i class="bi bi-check-circle-fill text-warning me-2"></i> Reportes Excel</li>
+                            </ul>
+                            <button onclick="window.openRegisterModal('Pro')" class="btn btn-light w-100 rounded-pill fw-bold text-primary shadow">Empezar Ahora</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card price-card p-4 text-center h-100">
+                            <h5 class="fw-bold text-secondary">Business</h5>
+                            <h2 class="fw-bold my-3">$40<small class="fs-6 text-muted">/mes</small></h2>
+                            <ul class="list-unstyled text-start small mb-4 d-grid gap-2">
+                                <li><i class="bi bi-check text-primary"></i> Multi-Sede</li>
+                                <li><i class="bi bi-check text-primary"></i> Auditoría Avanzada</li>
+                                <li><i class="bi bi-check text-primary"></i> API Access</li>
+                            </ul>
+                            <button onclick="window.openRegisterModal('Business')" class="btn btn-outline-dark w-100 rounded-pill">Elegir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <div id="view-super-admin" class="hidden d-flex bg-light">
-        <div class="sidebar p-3">
-            <h5 class="mb-4 ps-2"><i class="bi bi-shield-lock me-2"></i>MASTER ADMIN</h5>
-            <div class="nav flex-column">
-                <a href="#" class="nav-link active"><i class="bi bi-buildings me-2"></i>Empresas</a>
-                <a href="#" onclick="window.logout()" class="nav-link text-danger mt-auto"><i class="bi bi-power me-2"></i>Salir</a>
+    <div id="view-super-admin" class="hidden d-flex">
+        <div class="sa-sidebar">
+            <div class="p-4 bg-white border-bottom d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-primary"><i class="bi bi-shield-lock-fill me-2"></i>MASTER</span>
+                <button onclick="window.logout()" class="btn btn-sm btn-light text-danger"><i class="bi bi-power"></i></button>
             </div>
+            <div class="p-3 bg-light border-bottom">
+                <input type="text" id="sa-search" class="form-control mb-2" placeholder="Buscar empresa...">
+            </div>
+            <div id="sa-company-list" class="flex-grow-1 overflow-auto">
+                </div>
         </div>
-        <div class="main-content">
-            <div class="d-flex justify-content-between mb-4">
-                <h3>Gestión de Clientes</h3>
-                <button onclick="window.showCreateCompanyModal()" class="btn btn-primary">+ Nueva Empresa</button>
+        <div class="sa-content">
+            <div id="sa-empty" class="text-center mt-5 text-muted opacity-50">
+                <i class="bi bi-building display-1"></i><h3 class="mt-3">Selecciona un cliente</h3>
             </div>
-            <div class="card p-0 overflow-hidden">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead class="table-light"><tr><th class="ps-4">Empresa</th><th>Plan</th><th>Estado</th><th>Acciones</th></tr></thead>
-                    <tbody id="sa-company-list"></tbody>
-                </table>
+            <div id="sa-detail" class="hidden">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-0" id="sa-name">Empresa</h2>
+                        <span class="badge bg-primary" id="sa-plan">Plan</span>
+                        <span class="badge bg-secondary" id="sa-status">Estado</span>
+                    </div>
+                    <div>
+                        <button onclick="window.downloadReportAdmin()" class="btn btn-outline-dark me-2"><i class="bi bi-download"></i> XLS</button>
+                        <button id="sa-btn-block" class="btn btn-danger">Bloquear</button>
+                    </div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4"><div class="stat-card border-start border-4 border-primary"><h6>Usuarios</h6><h3 id="sa-kpi-users">0</h3></div></div>
+                    <div class="col-md-4"><div class="stat-card border-start border-4 border-success"><h6>Insumos</h6><h3 id="sa-kpi-items">0</h3></div></div>
+                    <div class="col-md-4"><div class="stat-card border-start border-4 border-warning"><h6>Pagos</h6><h3 id="sa-kpi-pay">$0</h3></div></div>
+                </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <ul class="nav nav-tabs card-header-tabs" id="saTabs">
+                            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-sa-pay">Pagos</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-sa-users">Usuarios</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="tab-sa-pay">
+                                <div class="row">
+                                    <div class="col-md-4 border-end">
+                                        <h6>Registrar Pago</h6>
+                                        <form id="sa-pay-form"><input id="pay-amt" type="number" class="form-control mb-2" placeholder="Monto" required><button class="btn btn-success w-100">Guardar</button></form>
+                                    </div>
+                                    <div class="col-md-8 px-4"><table class="table table-sm"><thead><tr><th>Fecha</th><th>Monto</th></tr></thead><tbody id="sa-pay-table"></tbody></table></div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-sa-users"><table class="table"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th></tr></thead><tbody id="sa-users-table"></tbody></table></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="view-client-app" class="hidden">
-        <div class="sidebar p-3 d-flex flex-column">
+        <div class="sidebar p-3">
             <div class="mb-4 px-2">
                 <div class="d-flex align-items-center gap-2 mb-1">
                     <div class="bg-primary rounded p-1"><i class="bi bi-building text-white"></i></div>
                     <h6 class="mb-0 fw-bold text-white text-truncate" id="app-company-name">Empresa</h6>
                 </div>
-                <small class="text-muted" id="app-user-role">Rol: Cargando...</small>
+                <small class="text-white-50" id="app-user-role">Rol</small>
             </div>
 
-            <div class="nav flex-column mb-auto" id="app-menu">
+            <div id="app-menu" class="flex-grow-1">
                 </div>
 
-            <div class="mt-auto border-top pt-3 border-secondary">
-                <div class="d-flex align-items-center justify-content-between px-2">
-                    <small class="text-muted text-truncate" style="max-width: 150px;" id="app-user-email">user</small>
-                    <button onclick="window.logout()" class="btn btn-sm btn-outline-danger border-0"><i class="bi bi-box-arrow-right"></i></button>
+            <div class="mt-auto border-top border-white border-opacity-10 pt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-white-50 text-truncate" style="max-width: 150px;" id="app-user-email">User</small>
+                    <button onclick="window.logout()" class="btn btn-sm text-danger"><i class="bi bi-box-arrow-right"></i></button>
                 </div>
             </div>
         </div>
@@ -118,96 +216,24 @@
             <div id="sect-dashboard" class="app-section">
                 <h3 class="fw-bold mb-4">Resumen Operativo</h3>
                 <div class="row g-4 mb-4">
-                    <div class="col-md-3"><div class="card p-3 stat-card"><h6>Tiquetes Abiertos</h6><h2 id="kpi-tickets">0</h2></div></div>
-                    <div class="col-md-3"><div class="card p-3 stat-card" style="border-color: #10b981;"><h6>Stock Bajo</h6><h2 id="kpi-stock">0</h2></div></div>
-                    <div class="col-md-3"><div class="card p-3 stat-card" style="border-color: #f59e0b;"><h6>Formularios Hoy</h6><h2 id="kpi-forms">0</h2></div></div>
-                </div>
-            </div>
-
-            <div id="sect-users" class="app-section hidden">
-                <div class="d-flex justify-content-between mb-4">
-                    <h3>Usuarios y Accesos</h3>
-                    <button onclick="window.openUserModal()" class="btn btn-primary">+ Nuevo Usuario</button>
-                </div>
-                <div class="card p-3">
-                    <table class="table table-hover">
-                        <thead><tr><th>Usuario</th><th>Email</th><th>Grupo/Rol</th><th>Acciones</th></tr></thead>
-                        <tbody id="table-users"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="sect-builder" class="app-section hidden">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card p-3 h-100">
-                            <h5>Mis Formularios / Activos</h5>
-                            <button onclick="window.initBuilderNew()" class="btn btn-outline-primary w-100 mb-3">+ Crear Nuevo Tipo</button>
-                            <div class="list-group" id="list-modules"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-8">
-                        <div id="builder-canvas" class="card p-4 hidden">
-                            <div class="d-flex justify-content-between mb-3">
-                                <input type="text" id="b-form-name" class="form-control fw-bold" placeholder="Nombre del Formulario (ej: Inspección Vehicular)">
-                                <button onclick="window.saveSchema()" class="btn btn-success">Guardar Estructura</button>
-                            </div>
-                            
-                            <div class="card bg-light p-3 mb-3">
-                                <h6>Configuración de Flujo</h6>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="b-flow-ticket">
-                                    <label class="form-check-label">Generar Tiquete de Seguimiento al enviar</label>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="b-flow-stock">
-                                    <label class="form-check-label">Habilitar descuento de Stock (Inventario)</label>
-                                </div>
-                            </div>
-
-                            <hr>
-                            <div id="b-fields-container" class="mb-3"></div>
-                            
-                            <div class="d-flex gap-2">
-                                <button onclick="window.addField('text')" class="btn btn-sm btn-outline-secondary"><i class="bi bi-fonts"></i> Texto</button>
-                                <button onclick="window.addField('number')" class="btn btn-sm btn-outline-secondary"><i class="bi bi-123"></i> Número</button>
-                                <button onclick="window.addField('date')" class="btn btn-sm btn-outline-secondary"><i class="bi bi-calendar"></i> Fecha</button>
-                                <button onclick="window.addField('select')" class="btn btn-sm btn-outline-secondary"><i class="bi bi-list-ul"></i> Selección</button>
-                                <button onclick="window.addField('signature')" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pen"></i> Firma</button>
-                                <button onclick="window.addField('image')" class="btn btn-sm btn-outline-secondary"><i class="bi bi-image"></i> Foto</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="sect-operations" class="app-section hidden">
-                <div class="d-flex justify-content-between mb-3">
-                    <h3 id="op-title">Registros</h3>
-                    <div>
-                        <button onclick="window.exportRecordsXLS()" class="btn btn-success me-2"><i class="bi bi-file-excel"></i> Exportar</button>
-                        <button onclick="window.openNewRecordModal()" class="btn btn-primary">+ Nuevo Registro</button>
-                    </div>
-                </div>
-                <div class="card p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light" id="op-table-head"></thead>
-                            <tbody id="op-table-body"></tbody>
-                        </table>
-                    </div>
+                    <div class="col-md-3"><div class="stat-card border-top border-4 border-primary"><h6>Tiquetes Abiertos</h6><h2 id="kpi-tickets">0</h2></div></div>
+                    <div class="col-md-3"><div class="stat-card border-top border-4 border-danger"><h6>Stock Bajo</h6><h2 id="kpi-stock">0</h2></div></div>
+                    <div class="col-md-3"><div class="stat-card border-top border-4 border-success"><h6>Total Items</h6><h2 id="kpi-total">0</h2></div></div>
                 </div>
             </div>
 
             <div id="sect-inventory" class="app-section hidden">
                 <div class="d-flex justify-content-between mb-4">
-                    <h3>Inventario de Insumos</h3>
-                    <button onclick="window.openStockModal()" class="btn btn-primary">+ Agregar Item</button>
+                    <h3>Inventario</h3>
+                    <div>
+                        <button onclick="window.downloadReportClient()" class="btn btn-success me-2"><i class="bi bi-file-excel"></i> XLS</button>
+                        <button onclick="window.openStockModal()" class="btn btn-primary">+ Item</button>
+                    </div>
                 </div>
-                <div class="card p-0">
-                    <table class="table table-hover mb-0">
-                        <thead><tr><th>SKU</th><th>Nombre</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
-                        <tbody id="inv-table-body"></tbody>
+                <div class="card border-0 shadow-sm">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light"><tr><th>Nombre</th><th>Categoría</th><th>Stock</th><th>Estado</th></tr></thead>
+                        <tbody id="client-inventory-table"></tbody>
                     </table>
                 </div>
             </div>
@@ -215,44 +241,97 @@
             <div id="sect-tickets" class="app-section hidden">
                 <h3>Centro de Tiquetes</h3>
                 <div class="row mt-3">
+                    <div class="col-md-4"><div class="card p-2 bg-light"><h6 class="text-center text-danger fw-bold">PENDIENTES</h6><div id="col-tickets-open" class="d-flex flex-column gap-2 p-2"></div></div></div>
+                    <div class="col-md-4"><div class="card p-2 bg-light"><h6 class="text-center text-primary fw-bold">EN PROCESO</h6><div id="col-tickets-prog" class="d-flex flex-column gap-2 p-2"></div></div></div>
+                    <div class="col-md-4"><div class="card p-2 bg-light"><h6 class="text-center text-success fw-bold">RESUELTO</h6><div id="col-tickets-done" class="d-flex flex-column gap-2 p-2"></div></div></div>
+                </div>
+            </div>
+
+            <div id="sect-builder" class="app-section hidden">
+                <div class="row">
                     <div class="col-md-4">
-                        <div class="card p-2 bg-light">
-                            <h6 class="text-center">PENDIENTES</h6>
-                            <div id="col-tickets-open" class="d-flex flex-column gap-2 p-2" style="min-height: 200px;"></div>
+                        <div class="card p-3 h-100">
+                            <h5>Mis Formularios</h5>
+                            <button onclick="window.initBuilderNew()" class="btn btn-outline-primary w-100 mb-3">+ Nuevo Tipo</button>
+                            <div class="list-group" id="list-modules"></div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card p-2 bg-light">
-                            <h6 class="text-center">EN PROCESO</h6>
-                            <div id="col-tickets-prog" class="d-flex flex-column gap-2 p-2" style="min-height: 200px;"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card p-2 bg-light">
-                            <h6 class="text-center">RESUELTO</h6>
-                            <div id="col-tickets-done" class="d-flex flex-column gap-2 p-2" style="min-height: 200px;"></div>
+                    <div class="col-md-8">
+                        <div id="builder-canvas" class="card p-4 hidden">
+                            <div class="d-flex justify-content-between mb-3">
+                                <input type="text" id="b-form-name" class="form-control fw-bold" placeholder="Nombre (ej: Inspección Vehicular)">
+                                <button onclick="window.saveSchema()" class="btn btn-success">Guardar</button>
+                            </div>
+                            <div class="card bg-light p-3 mb-3">
+                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="b-flow-ticket"><label>Generar Tiquete Automático</label></div>
+                            </div>
+                            <div id="b-fields-container" class="mb-3"></div>
+                            <div class="d-flex gap-2">
+                                <button onclick="window.addField('text')" class="btn btn-sm btn-outline-secondary">Texto</button>
+                                <button onclick="window.addField('number')" class="btn btn-sm btn-outline-secondary">Número</button>
+                                <button onclick="window.addField('date')" class="btn btn-sm btn-outline-secondary">Fecha</button>
+                                <button onclick="window.addField('select')" class="btn btn-sm btn-outline-secondary">Selección</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <div id="sect-users" class="app-section hidden">
+                <div class="d-flex justify-content-between mb-4">
+                    <h3>Usuarios</h3>
+                    <button onclick="window.openUserModal()" class="btn btn-primary">+ Usuario</button>
+                </div>
+                <div class="card border-0 shadow-sm"><table class="table table-hover"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th></tr></thead><tbody id="client-users-table"></tbody></table></div>
+            </div>
+
+            <div id="sect-operations" class="app-section hidden">
+                <div class="d-flex justify-content-between mb-3">
+                    <h3 id="op-title">Registros</h3>
+                    <button onclick="window.openNewRecordModal()" class="btn btn-primary">+ Nuevo Registro</button>
+                </div>
+                <div class="card p-0"><div class="table-responsive"><table class="table table-hover mb-0"><thead class="table-light" id="op-table-head"></thead><tbody id="op-table-body"></tbody></table></div></div>
+            </div>
+
         </div>
     </div>
 
-    <div class="modal fade" id="loginModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content p-4"><h4 class="text-center mb-3">Acceso Corporativo</h4><form id="loginForm"><input id="loginEmail" class="form-control mb-2" placeholder="Email"><input type="password" id="loginPass" class="form-control mb-3" placeholder="Password"><button class="btn btn-primary w-100">Entrar</button></form></div></div></div>
+    <div class="modal fade" id="loginModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 shadow p-4 text-center">
+        <h3 class="fw-bold mb-3">Bienvenido</h3>
+        <button id="btnGoogle" class="google-btn w-100 py-2 mb-3 rounded d-flex align-items-center justify-content-center gap-2 shadow-sm"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Google</button>
+        <div class="text-muted small mb-3">- O -</div>
+        <form id="emailLoginForm"><input id="loginEmail" class="form-control mb-2" placeholder="Email"><input type="password" id="loginPass" class="form-control mb-3" placeholder="Contraseña"><button class="btn btn-primary w-100 rounded-pill">Entrar</button></form>
+    </div></div></div>
 
-    <div class="modal fade" id="userModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>Nuevo Usuario</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="userForm"><input id="uName" class="form-control mb-2" placeholder="Nombre"><input id="uEmail" class="form-control mb-2" placeholder="Email"><input id="uPass" class="form-control mb-2" placeholder="Contraseña"><label>Grupo de Acceso</label><select id="uGroup" class="form-select"><option value="ADMIN">Administrador Total</option><option value="OPERACIONES">Operaciones (Inventario + Tiquetes)</option><option value="RRHH">Recursos Humanos (Formularios)</option></select><button class="btn btn-primary w-100 mt-3">Crear</button></form></div></div></div></div>
+    <div class="modal fade" id="registerPayModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 shadow p-4">
+        <h5 class="fw-bold mb-3">Suscripción <span id="reg-plan-name" class="text-primary"></span></h5>
+        <form id="registerPayForm">
+            <div class="row g-2 mb-3"><div class="col-6"><input id="reg-email" class="form-control" placeholder="Email Admin" required></div><div class="col-6"><input type="password" id="reg-pass" class="form-control" placeholder="Pass" required></div></div>
+            <div class="bg-light p-3 rounded mb-3 border"><div class="form-check"><input class="form-check-input" type="radio" checked><label>Tarjeta de Crédito (Simulado)</label></div></div>
+            <input type="hidden" id="reg-plan-selected"><button class="btn btn-success w-100 rounded-pill fw-bold">Pagar y Registrarse</button>
+        </form>
+    </div></div></div>
 
-    <div class="modal fade" id="recordModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 id="rec-modal-title">Nuevo Registro</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="recordForm"><div id="rec-dynamic-fields"></div><div class="form-check mt-3"><input class="form-check-input" type="checkbox" id="rec-is-draft"><label class="form-check-label text-muted">Guardar como Borrador (No enviar)</label></div><button type="submit" class="btn btn-primary w-100 mt-3">Guardar Registro</button></form></div></div></div></div>
+    <div class="modal fade" id="setupModal" tabindex="-1" data-bs-backdrop="static"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 shadow p-5 text-center">
+        <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i><h3 class="fw-bold">¡Pago Exitoso!</h3><p>Configura tu empresa para terminar.</p>
+        <form id="setupForm"><input id="setup-name" class="form-control mb-3" placeholder="Nombre de tu Empresa" required><button class="btn btn-primary w-100 rounded-pill">Ir al Panel</button></form>
+    </div></div></div>
 
-    <div class="modal fade" id="stockModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5>Item de Inventario</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="stockForm"><input id="stName" class="form-control mb-2" placeholder="Nombre Item"><input type="number" id="stQty" class="form-control mb-2" placeholder="Cantidad Inicial"><button class="btn btn-success w-100">Guardar</button></form></div></div></div></div>
+    <div class="modal fade" id="userModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header border-0"><h5>Nuevo Empleado</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body">
+        <form id="userForm"><input id="uName" class="form-control mb-2" placeholder="Nombre"><input id="uEmail" class="form-control mb-2" placeholder="Email"><input id="uPass" class="form-control mb-2" placeholder="Pass"><select id="uRole" class="form-select mb-3"><option value="OPERADOR">Operador</option><option value="AUDITOR">Auditor</option><option value="COMPANY_ADMIN">Admin</option></select><button class="btn btn-primary w-100">Crear</button></form>
+    </div></div></div></div>
+
+    <div class="modal fade" id="stockModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header border-0"><h5>Nuevo Item</h5></div><div class="modal-body"><form id="stockForm"><input id="stName" class="form-control mb-2" placeholder="Nombre"><select id="stCat" class="form-select mb-2"><option>General</option><option>EPP</option><option>Tecnología</option></select><input type="number" id="stQty" class="form-control mb-2" placeholder="Cantidad"><button class="btn btn-success w-100">Guardar</button></form></div></div></div></div>
+
+    <div class="modal fade" id="recordModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header border-0"><h5 id="rec-title">Nuevo</h5></div><div class="modal-body"><form id="recordForm"><div id="rec-fields"></div><button class="btn btn-primary w-100 mt-3">Enviar</button></form></div></div></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, query, where, serverTimestamp, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, query, where, orderBy, serverTimestamp, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // CONFIGURACIÓN (Reemplaza con la tuya)
         const firebaseConfig = {
             apiKey: "AIzaSyA5pUM_BycmKkbfhreDUrUH5CJEg_ykUW4",
             authDomain: "proyectocoorporativo.firebaseapp.com",
@@ -265,10 +344,11 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
 
-        // Estado
         let currentUser = null;
-        let activeModuleSchema = null; // Esquema del formulario actual
+        let activeSchema = null;
+        let selectedCompanyData = null; // Para Super Admin
 
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
@@ -277,326 +357,242 @@
                 if (snap.exists()) {
                     currentUser = snap.data();
                     if(currentUser.role === 'SUPER_ADMIN') {
-                        showView('view-super-admin');
-                        loadSuperAdmin();
+                        showView('view-super-admin'); initSA();
+                    } else if (currentUser.role === 'PENDING_OWNER') {
+                        new bootstrap.Modal(document.getElementById('setupModal')).show();
                     } else {
-                        showView('view-client-app');
-                        loadClientApp();
+                        // Check Block
+                        const cSnap = await getDoc(doc(db, "companies", currentUser.companyId));
+                        if(cSnap.data().status === 'blocked') { alert("Cuenta Bloqueada"); signOut(auth); return; }
+                        showView('view-client-app'); loadClientApp();
                     }
-                }
-            } else {
-                showView('view-landing');
-            }
+                } else { signOut(auth); } // Usuario fantasma
+            } else { showView('view-landing'); }
         });
 
-        window.login = async (e) => {
+        window.showView = (id) => { document.querySelectorAll('body > div[id^="view-"]').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
+        window.logout = () => signOut(auth).then(()=>location.reload());
+        
+        // --- LOGIN & REGISTRO ---
+        window.showLoginModal = () => new bootstrap.Modal(document.getElementById('loginModal')).show();
+        window.openRegisterModal = (plan) => {
+            document.getElementById('reg-plan-name').innerText = plan;
+            document.getElementById('reg-plan-selected').value = plan;
+            new bootstrap.Modal(document.getElementById('registerPayModal')).show();
+        };
+
+        document.getElementById('btnGoogle').onclick = async () => { try{await signInWithPopup(auth, provider); bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();}catch(e){alert(e.message)} };
+        document.getElementById('emailLoginForm').onsubmit = async (e) => { e.preventDefault(); try{await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPass').value); bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();}catch(e){alert(e.message)} };
+
+        // FLUJO PAGO -> SETUP
+        document.getElementById('registerPayForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn=e.target.querySelector('button'); btn.disabled=true; btn.innerText="Procesando...";
+            try {
+                const uc = await createUserWithEmailAndPassword(auth, document.getElementById('reg-email').value, document.getElementById('reg-pass').value);
+                await setDoc(doc(db, "users", uc.user.uid), {
+                    email: document.getElementById('reg-email').value,
+                    role: 'PENDING_OWNER',
+                    plan: document.getElementById('reg-plan-selected').value
+                });
+                bootstrap.Modal.getInstance(document.getElementById('registerPayModal')).hide();
+                // onAuthStateChanged abre setupModal
+            } catch(e){alert(e.message); btn.disabled=false;}
+        };
+
+        document.getElementById('setupForm').onsubmit = async (e) => {
             e.preventDefault();
             try {
-                await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPass').value);
-                bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
-            } catch(e) { alert(e.message); }
+                const compRef = await addDoc(collection(db, "companies"), { name: document.getElementById('setup-name').value, plan: currentUser.plan, status: 'active', createdAt: serverTimestamp() });
+                await updateDoc(doc(db, "users", auth.currentUser.uid), { role: 'COMPANY_ADMIN', companyId: compRef.id, name: "Admin" });
+                bootstrap.Modal.getInstance(document.getElementById('setupModal')).hide();
+                location.reload();
+            } catch(e){alert(e.message)}
         };
-        document.getElementById('loginForm').onsubmit = window.login;
-        window.logout = () => signOut(auth).then(()=>location.reload());
-        window.showLoginModal = () => new bootstrap.Modal(document.getElementById('loginModal')).show();
-        window.showView = (id) => { document.querySelectorAll('body > div[id^="view-"]').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
 
-        // --- CLIENT APP LOGIC ---
-
+        // --- CLIENT APP ---
         async function loadClientApp() {
-            // 1. Header Info
-            const compSnap = await getDoc(doc(db, "companies", currentUser.companyId));
-            document.getElementById('app-company-name').innerText = compSnap.data().name;
+            const comp = await getDoc(doc(db, "companies", currentUser.companyId));
+            document.getElementById('app-company-name').innerText = comp.data().name;
             document.getElementById('app-user-role').innerText = currentUser.role;
             document.getElementById('app-user-email').innerText = currentUser.email;
 
-            // 2. Build Menu based on Role/Group
-            const menu = document.getElementById('app-menu');
-            menu.innerHTML = `<div class="nav-group-title">General</div>
-                <a href="#" onclick="nav('dashboard')" class="nav-link active"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>`;
+            // Menú
+            const m = document.getElementById('app-menu');
+            m.innerHTML = `<div class="nav-group">General</div><a href="#" onclick="nav('dashboard')" class="nav-link active"><i class="bi bi-speedometer2"></i>Dashboard</a>`;
             
-            // Si es Admin, ve configuración
-            if(currentUser.role === 'COMPANY_ADMIN' || currentUser.group === 'ADMIN') {
-                menu.innerHTML += `<div class="nav-group-title">Administración</div>
-                <a href="#" onclick="nav('users')" class="nav-link"><i class="bi bi-people me-2"></i>Usuarios</a>
-                <a href="#" onclick="nav('builder')" class="nav-link"><i class="bi bi-tools me-2"></i>Constructor</a>`;
-            }
-
-            // Módulos Dinámicos (Formularios creados)
+            // Formularios Dinámicos
             const schemas = await getDocs(collection(db, `companies/${currentUser.companyId}/schemas`));
             if(!schemas.empty) {
-                menu.innerHTML += `<div class="nav-group-title">Operaciones</div>`;
-                schemas.forEach(s => {
-                    const sc = s.data();
-                    menu.innerHTML += `<a href="#" onclick="loadModule('${s.id}')" class="nav-link"><i class="bi bi-journal-text me-2"></i>${sc.name}</a>`;
-                });
+                m.innerHTML += `<div class="nav-group">Operaciones</div>`;
+                schemas.forEach(s => m.innerHTML += `<a href="#" onclick="loadModule('${s.id}')" class="nav-link"><i class="bi bi-file-text"></i>${s.data().name}</a>`);
             }
 
-            menu.innerHTML += `<div class="nav-group-title">Logística</div>
-                <a href="#" onclick="nav('inventory')" class="nav-link"><i class="bi bi-box-seam me-2"></i>Inventario</a>
-                <a href="#" onclick="nav('tickets')" class="nav-link"><i class="bi bi-ticket-detailed me-2"></i>Tiquetes</a>`;
-            
+            m.innerHTML += `<div class="nav-group">Logística</div>
+                <a href="#" onclick="nav('inventory')" class="nav-link"><i class="bi bi-box-seam"></i>Inventario</a>
+                <a href="#" onclick="nav('tickets')" class="nav-link"><i class="bi bi-ticket-detailed"></i>Tiquetes</a>`;
+
+            if(currentUser.role === 'COMPANY_ADMIN') {
+                m.innerHTML += `<div class="nav-group">Admin</div>
+                <a href="#" onclick="nav('users')" class="nav-link"><i class="bi bi-people"></i>Usuarios</a>
+                <a href="#" onclick="nav('builder')" class="nav-link"><i class="bi bi-tools"></i>Constructor</a>`;
+            }
             loadKPIs();
         }
 
-        window.nav = (sect) => {
+        window.nav = (id) => {
             document.querySelectorAll('.app-section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`sect-${sect}`).classList.remove('hidden');
-            if(sect === 'builder') loadBuilderList();
-            if(sect === 'inventory') loadInventory();
-            if(sect === 'tickets') loadTickets();
+            document.getElementById(`sect-${id}`).classList.remove('hidden');
+            if(id==='inventory') loadInventory();
+            if(id==='tickets') loadTickets();
+            if(id==='builder') loadBuilderList();
+            if(id==='users') loadClientUsers();
         };
 
-        // --- FORM BUILDER (Constructor) ---
-        let builderFields = [];
-        
-        window.loadBuilderList = async () => {
-            const list = document.getElementById('list-modules');
-            list.innerHTML = "";
-            const snap = await getDocs(collection(db, `companies/${currentUser.companyId}/schemas`));
-            snap.forEach(d => {
-                list.innerHTML += `<a href="#" class="list-group-item list-group-item-action" onclick="alert('Edición pendiente de implementar')">${d.data().name}</a>`;
-            });
-        };
-
-        window.initBuilderNew = () => {
-            builderFields = [];
-            document.getElementById('b-form-name').value = "";
-            document.getElementById('builder-canvas').classList.remove('hidden');
-            renderBuilder();
-        };
-
-        window.addField = (type) => {
-            builderFields.push({ type, label: 'Nuevo Campo', required: false, options: '' });
-            renderBuilder();
-        };
-
-        function renderBuilder() {
-            const c = document.getElementById('b-fields-container');
-            c.innerHTML = "";
-            builderFields.forEach((f, i) => {
-                let extra = "";
-                if(f.type === 'select') extra = `<input type="text" class="form-control form-control-sm mt-1" placeholder="Opciones separadas por coma" value="${f.options}" onchange="updateField(${i}, 'options', this.value)">`;
-                
-                c.innerHTML += `
-                <div class="builder-field">
-                    <i class="bi bi-x-circle remove-field" onclick="removeField(${i})"></i>
-                    <div class="row g-2">
-                        <div class="col-8">
-                            <input type="text" class="form-control form-control-sm fw-bold" value="${f.label}" onchange="updateField(${i}, 'label', this.value)" placeholder="Etiqueta del Campo">
-                        </div>
-                        <div class="col-4 text-end">
-                            <span class="badge bg-secondary">${f.type}</span>
-                        </div>
-                        <div class="col-12">${extra}</div>
-                    </div>
-                </div>`;
-            });
-        }
-        window.removeField = (i) => { builderFields.splice(i, 1); renderBuilder(); };
-        window.updateField = (i, k, v) => { builderFields[i][k] = v; };
-
-        window.saveSchema = async () => {
-            const name = document.getElementById('b-form-name').value;
-            if(!name) return alert("Nombre requerido");
-            
-            await addDoc(collection(db, `companies/${currentUser.companyId}/schemas`), {
-                name,
-                fields: builderFields,
-                genTicket: document.getElementById('b-flow-ticket').checked,
-                useStock: document.getElementById('b-flow-stock').checked,
-                createdAt: serverTimestamp()
-            });
-            alert("Módulo Creado");
-            document.getElementById('builder-canvas').classList.add('hidden');
-            loadClientApp(); // Recargar menú
-        };
-
-        // --- OPERACIONES (Uso de Módulos) ---
-        window.loadModule = async (schemaId) => {
-            const snap = await getDoc(doc(db, `companies/${currentUser.companyId}/schemas`, schemaId));
-            activeModuleSchema = { id: schemaId, ...snap.data() };
-            
-            document.getElementById('op-title').innerText = activeModuleSchema.name;
-            
-            // Tabla Headers
-            let h = `<tr><th>Fecha</th><th>Usuario</th>`;
-            activeModuleSchema.fields.slice(0, 3).forEach(f => h += `<th>${f.label}</th>`); // Mostrar primeros 3 campos
-            h += `<th>Estado</th><th>Acciones</th></tr>`;
-            document.getElementById('op-table-head').innerHTML = h;
-
-            loadRecords();
-            nav('operations');
-        };
-
-        async function loadRecords() {
-            const snap = await getDocs(collection(db, `companies/${currentUser.companyId}/schemas/${activeModuleSchema.id}/records`));
-            const t = document.getElementById('op-table-body');
-            t.innerHTML = "";
-            snap.forEach(d => {
-                const r = d.data();
-                let cols = `<td>${new Date(r.createdAt.seconds*1000).toLocaleDateString()}</td><td>${r.userName}</td>`;
-                activeModuleSchema.fields.slice(0, 3).forEach(f => cols += `<td>${r.data[f.label] || '-'}</td>`);
-                cols += `<td><span class="badge ${r.status==='draft'?'bg-warning':'bg-success'}">${r.status}</span></td><td><button class="btn btn-sm btn-light border">Ver</button></td>`;
-                t.innerHTML += `<tr>${cols}</tr>`;
-            });
-        }
-
-        window.openNewRecordModal = () => {
-            document.getElementById('rec-modal-title').innerText = "Nuevo: " + activeModuleSchema.name;
-            const c = document.getElementById('rec-dynamic-fields');
-            c.innerHTML = "";
-            
-            activeModuleSchema.fields.forEach((f, i) => {
-                let input = "";
-                if(f.type === 'text') input = `<input class="form-control dyn-input" data-label="${f.label}">`;
-                if(f.type === 'number') input = `<input type="number" class="form-control dyn-input" data-label="${f.label}">`;
-                if(f.type === 'date') input = `<input type="date" class="form-control dyn-input" data-label="${f.label}">`;
-                if(f.type === 'select') {
-                    input = `<select class="form-select dyn-input" data-label="${f.label}">`;
-                    f.options.split(',').forEach(o => input += `<option>${o.trim()}</option>`);
-                    input += `</select>`;
-                }
-                if(f.type === 'signature') input = `<canvas class="sig-pad" id="sig-${i}" height="100"></canvas><input type="hidden" class="dyn-input" data-type="sig" data-id="sig-${i}" data-label="${f.label}">`;
-                
-                c.innerHTML += `<div class="mb-3"><label class="fw-bold small">${f.label}</label>${input}</div>`;
-            });
-            new bootstrap.Modal(document.getElementById('recordModal')).show();
-        };
-
-        document.getElementById('recordForm').onsubmit = async (e) => {
-            e.preventDefault();
-            let data = {};
-            document.querySelectorAll('.dyn-input').forEach(el => {
-                data[el.dataset.label] = el.value;
-                // Lógica de Canvas/Firma pendiente para brevedad (toDataURL)
-            });
-
-            const status = document.getElementById('rec-is-draft').checked ? 'draft' : 'submitted';
-
-            // Guardar Registro
-            const recRef = await addDoc(collection(db, `companies/${currentUser.companyId}/schemas/${activeModuleSchema.id}/records`), {
-                data,
-                status,
-                userId: currentUser.uid || 'anon',
-                userName: currentUser.name || 'Usuario',
-                createdAt: serverTimestamp()
-            });
-
-            // Flujo: Crear Tiquete Automático
-            if(status === 'submitted' && activeModuleSchema.genTicket) {
-                await addDoc(collection(db, `companies/${currentUser.companyId}/tickets`), {
-                    title: `Auto: ${activeModuleSchema.name} #${recRef.id.slice(0,4)}`,
-                    status: 'OPEN',
-                    sourceId: recRef.id,
-                    createdAt: serverTimestamp()
-                });
-            }
-
-            alert("Guardado");
-            bootstrap.Modal.getInstance(document.getElementById('recordModal')).hide();
-            loadRecords();
-        };
-
-        // --- INVENTARIO ---
+        // Inventory
         window.openStockModal = () => new bootstrap.Modal(document.getElementById('stockModal')).show();
         document.getElementById('stockForm').onsubmit = async (e) => {
             e.preventDefault();
             await addDoc(collection(db, `companies/${currentUser.companyId}/supplies`), {
-                name: document.getElementById('stName').value,
-                stock: parseInt(document.getElementById('stQty').value)
+                name: document.getElementById('stName').value, category: document.getElementById('stCat').value, stock: parseInt(document.getElementById('stQty').value)
             });
-            bootstrap.Modal.getInstance(document.getElementById('stockModal')).hide();
-            loadInventory();
+            bootstrap.Modal.getInstance(document.getElementById('stockModal')).hide(); loadInventory();
         };
         async function loadInventory() {
             const s = await getDocs(collection(db, `companies/${currentUser.companyId}/supplies`));
-            const t = document.getElementById('inv-table-body'); t.innerHTML = "";
-            s.forEach(d => {
-                const i = d.data();
-                t.innerHTML += `<tr><td>${d.id.slice(0,6)}</td><td>${i.name}</td><td>${i.stock}</td><td>${i.stock<5?'<span class="badge bg-danger">Bajo</span>':'OK'}</td><td><button class="btn btn-sm btn-light">+</button></td></tr>`;
-            });
+            const t = document.getElementById('client-inventory-table'); t.innerHTML = "";
+            let data=[]; s.forEach(d => { data.push(d.data()); t.innerHTML += `<tr><td>${d.data().name}</td><td>${d.data().category}</td><td>${d.data().stock}</td><td>${d.data().stock<5?'<span class="badge bg-danger">Bajo</span>':'OK'}</td></tr>` });
+            window.clientExportData = data;
         }
 
-        // --- TIQUETES (KANBAN SIMPLE) ---
+        // Builder
+        let bFields = [];
+        window.initBuilderNew = () => { bFields=[]; document.getElementById('b-form-name').value=""; document.getElementById('builder-canvas').classList.remove('hidden'); renderBuilder(); };
+        window.addField = (t) => { bFields.push({type:t, label:'Campo'}); renderBuilder(); };
+        function renderBuilder() {
+            const c=document.getElementById('b-fields-container'); c.innerHTML="";
+            bFields.forEach((f,i) => c.innerHTML += `<div class="builder-field"><i class="bi bi-x-circle remove-field" onclick="removeField(${i})"></i><input class="form-control form-control-sm" value="${f.label}" onchange="updateF(${i},this.value)"> <span class="badge bg-secondary">${f.type}</span></div>`);
+        }
+        window.removeField=(i)=>{bFields.splice(i,1);renderBuilder()}; window.updateF=(i,v)=>{bFields[i].label=v};
+        window.saveSchema = async () => {
+            await addDoc(collection(db, `companies/${currentUser.companyId}/schemas`), { name:document.getElementById('b-form-name').value, fields:bFields, genTicket:document.getElementById('b-flow-ticket').checked });
+            alert("Guardado"); location.reload();
+        };
+        window.loadBuilderList = async () => {
+            const l=document.getElementById('list-modules'); l.innerHTML="";
+            const s=await getDocs(collection(db, `companies/${currentUser.companyId}/schemas`));
+            s.forEach(d => l.innerHTML += `<a href="#" class="list-group-item list-group-item-action">${d.data().name}</a>`);
+        };
+
+        // Operations (Forms)
+        window.loadModule = async (sid) => {
+            const snap = await getDoc(doc(db, `companies/${currentUser.companyId}/schemas`, sid));
+            activeSchema = {id:sid, ...snap.data()};
+            document.getElementById('op-title').innerText = activeSchema.name;
+            const rs = await getDocs(collection(db, `companies/${currentUser.companyId}/schemas/${sid}/records`));
+            let h=`<tr><th>Fecha</th><th>Usuario</th>`, b="";
+            activeSchema.fields.forEach(f=>h+=`<th>${f.label}</th>`);
+            document.getElementById('op-table-head').innerHTML = h + `</tr>`;
+            rs.forEach(d => {
+                const r=d.data();
+                b+=`<tr><td>${new Date(r.createdAt.seconds*1000).toLocaleDateString()}</td><td>${r.userName}</td>`;
+                activeSchema.fields.forEach(f=>b+=`<td>${r.data[f.label]||'-'}</td>`);
+                b+=`</tr>`;
+            });
+            document.getElementById('op-table-body').innerHTML = b;
+            nav('operations');
+        };
+        window.openNewRecordModal = () => {
+            document.getElementById('rec-title').innerText=activeSchema.name;
+            const c=document.getElementById('rec-fields'); c.innerHTML="";
+            activeSchema.fields.forEach(f => c.innerHTML += `<div class="mb-2"><label>${f.label}</label><input class="form-control dyn-inp" data-label="${f.label}" type="${f.type=='date'?'date':(f.type=='number'?'number':'text')}"></div>`);
+            new bootstrap.Modal(document.getElementById('recordModal')).show();
+        };
+        document.getElementById('recordForm').onsubmit = async (e) => {
+            e.preventDefault();
+            let d={}; document.querySelectorAll('.dyn-inp').forEach(i=>d[i.dataset.label]=i.value);
+            const ref = await addDoc(collection(db, `companies/${currentUser.companyId}/schemas/${activeSchema.id}/records`), { data:d, userId:auth.currentUser.uid, userName:currentUser.name, createdAt:serverTimestamp() });
+            if(activeSchema.genTicket) await addDoc(collection(db, `companies/${currentUser.companyId}/tickets`), { title:`Auto: ${activeSchema.name}`, status:'OPEN', createdAt:serverTimestamp() });
+            bootstrap.Modal.getInstance(document.getElementById('recordModal')).hide(); loadModule(activeSchema.id);
+        };
+
+        // Tickets
         async function loadTickets() {
             const s = await getDocs(collection(db, `companies/${currentUser.companyId}/tickets`));
-            document.getElementById('col-tickets-open').innerHTML = "";
-            document.getElementById('col-tickets-prog').innerHTML = "";
-            document.getElementById('col-tickets-done').innerHTML = "";
-            
-            s.forEach(d => {
-                const t = d.data();
-                const card = `<div class="card p-2 shadow-sm border-start border-4 ${t.status==='OPEN'?'border-danger':(t.status==='WIP'?'border-primary':'border-success')}"><small class="fw-bold">${t.title}</small></div>`;
-                
-                if(t.status === 'OPEN') document.getElementById('col-tickets-open').innerHTML += card;
-                if(t.status === 'WIP') document.getElementById('col-tickets-prog').innerHTML += card;
-                if(t.status === 'DONE') document.getElementById('col-tickets-done').innerHTML += card;
-            });
+            const cols = {OPEN:document.getElementById('col-tickets-open'), WIP:document.getElementById('col-tickets-prog'), DONE:document.getElementById('col-tickets-done')};
+            Object.values(cols).forEach(c=>c.innerHTML="");
+            s.forEach(d => { const t=d.data(); if(cols[t.status]) cols[t.status].innerHTML += `<div class="card p-2 shadow-sm border-start border-4 border-${t.status=='OPEN'?'danger':(t.status=='WIP'?'primary':'success')}"><small>${t.title}</small></div>`; });
         }
 
-        // --- DASHBOARD KPIS ---
-        async function loadKPIs() {
-            // Nota: En prod usar contadores. Aquí lectura simple.
-            const t = await getCountFromServer(collection(db, `companies/${currentUser.companyId}/tickets`));
-            const f = 0; // Calcular logs hoy
-            document.getElementById('kpi-tickets').innerText = t.data().count;
-        }
-
-        // --- GESTIÓN USUARIOS (Admin Empresa) ---
+        // Users
         window.openUserModal = () => new bootstrap.Modal(document.getElementById('userModal')).show();
         document.getElementById('userForm').onsubmit = async (e) => {
             e.preventDefault();
-            // Truco App Secundaria para no cerrar sesión
-            const { initializeApp: init2 } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
-            const { getAuth: auth2, createUserWithEmailAndPassword: create2, signOut: out2 } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
-            
-            const app2 = init2(firebaseConfig, "Secondary");
-            const a2 = auth2(app2);
-            const uc = await create2(a2, document.getElementById('uEmail').value, document.getElementById('uPass').value);
-            await out2(a2);
-
-            await setDoc(doc(db, "users", uc.user.uid), {
-                name: document.getElementById('uName').value,
-                email: document.getElementById('uEmail').value,
-                role: 'USER',
-                group: document.getElementById('uGroup').value,
-                companyId: currentUser.companyId
-            });
-            alert("Usuario Creado");
-            bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
-            loadUsersList();
+            try {
+                const secApp = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js").then(m=>m.initializeApp(firebaseConfig,"Sec"));
+                const secAuth = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js").then(m=>m.getAuth(secApp));
+                const uc = await createUserWithEmailAndPassword(secAuth, document.getElementById('uEmail').value, document.getElementById('uPass').value);
+                await setDoc(doc(db, "users", uc.user.uid), { email:document.getElementById('uEmail').value, name:document.getElementById('uName').value, role:document.getElementById('uRole').value, companyId:currentUser.companyId });
+                bootstrap.Modal.getInstance(document.getElementById('userModal')).hide(); loadClientUsers();
+            } catch(e){alert(e.message)}
         };
+        async function loadClientUsers() {
+            const s = await getDocs(query(collection(db, "users"), where("companyId","==",currentUser.companyId)));
+            const t=document.getElementById('client-users-table'); t.innerHTML="";
+            s.forEach(d=> t.innerHTML+=`<tr><td>${d.data().name}</td><td>${d.data().email}</td><td><span class="badge bg-secondary">${d.data().role}</span></td></tr>`);
+        }
 
-        async function loadUsersList() {
-            const q = query(collection(db, "users"), where("companyId", "==", currentUser.companyId));
-            const s = await getDocs(q);
-            const t = document.getElementById('table-users'); t.innerHTML = "";
+        // Utils
+        window.startDemo = () => { currentUser = { role:'DEMO', companyId:'DEMO', email:'demo@user.com' }; showView('view-client-app'); loadClientApp(); };
+        window.downloadReportClient = () => {
+            let h=`<table><thead><tr><th>Item</th><th>Cat</th><th>Stock</th></tr></thead><tbody>`;
+            window.clientExportData.forEach(r=>h+=`<tr><td>${r.name}</td><td>${r.category}</td><td>${r.stock}</td></tr>`);
+            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([h+`</tbody></table>`],{type:'application/vnd.ms-excel'})); a.download='Report.xls'; a.click();
+        };
+        async function loadKPIs() {
+            try {
+                const ts = await getCountFromServer(collection(db, `companies/${currentUser.companyId}/tickets`));
+                const is = await getCountFromServer(collection(db, `companies/${currentUser.companyId}/supplies`));
+                document.getElementById('kpi-tickets').innerText = ts.data().count;
+                document.getElementById('kpi-total').innerText = is.data().count;
+            } catch(e){}
+        }
+
+        // --- SUPER ADMIN LOGIC ---
+        async function initSA() {
+            const s = await getDocs(collection(db, "companies"));
+            const l = document.getElementById('sa-company-list'); l.innerHTML="";
             s.forEach(d => {
-                const u = d.data();
-                t.innerHTML += `<tr><td>${u.name}</td><td>${u.email}</td><td><span class="badge bg-info">${u.group}</span></td><td><button class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></button></td></tr>`;
+                const c=d.data();
+                l.innerHTML += `<div class="company-item" onclick="window.selComp('${d.id}')"><b>${c.name}</b><br><small>${c.plan}</small></div>`;
             });
         }
+        window.selComp = async (id) => {
+            const snap = await getDoc(doc(db, "companies", id));
+            selectedCompanyData = {id, ...snap.data()};
+            document.getElementById('sa-empty').classList.add('hidden');
+            document.getElementById('sa-detail').classList.remove('hidden');
+            document.getElementById('sa-name').innerText = selectedCompanyData.name;
+            document.getElementById('sa-plan').innerText = selectedCompanyData.plan;
+            document.getElementById('sa-status').innerText = selectedCompanyData.status;
+            
+            // Users SA
+            const us = await getDocs(query(collection(db, "users"), where("companyId","==",id)));
+            const t = document.getElementById('sa-users-table'); t.innerHTML="";
+            us.forEach(d=> t.innerHTML+=`<tr><td>${d.data().name}</td><td>${d.data().email}</td><td>${d.data().role}</td></tr>`);
+            document.getElementById('sa-kpi-users').innerText = us.size;
 
-        // --- SUPER ADMIN ---
-        async function loadSuperAdmin() {
-            const snap = await getDocs(collection(db, "companies"));
-            const t = document.getElementById('sa-company-list'); t.innerHTML="";
-            snap.forEach(d => {
-                const c = d.data();
-                t.innerHTML += `<tr><td>${c.name}</td><td>${c.plan}</td><td>${c.status}</td><td><button class="btn btn-sm btn-outline-dark">Gestionar</button></td></tr>`;
-            });
+            // Pay SA
+            const ps = await getDocs(collection(db, `companies/${id}/payments`));
+            const pt = document.getElementById('sa-pay-table'); pt.innerHTML=""; let tot=0;
+            ps.forEach(d=> { tot+=d.data().amount; pt.innerHTML+=`<tr><td>${new Date(d.data().date.seconds*1000).toLocaleDateString()}</td><td>$${d.data().amount}</td></tr>`; });
+            document.getElementById('sa-kpi-pay').innerText = "$"+tot;
         }
-
-        window.showCreateCompanyModal = () => alert("Implementado en versión anterior (reutilizar código)");
-
-        // Helpers XLS
-        window.exportRecordsXLS = () => {
-            let html = document.querySelector('.table-responsive').innerHTML;
-            const url = URL.createObjectURL(new Blob([html], {type:'application/vnd.ms-excel'}));
-            const a = document.createElement('a'); a.href = url; a.download = 'Reporte.xls'; a.click();
-        };
-
+        document.getElementById('sa-pay-form').onsubmit = async (e) => {
+            e.preventDefault();
+            await addDoc(collection(db, `companies/${selectedCompanyData.id}/payments`), { amount:parseFloat(document.getElementById('pay-amt').value), date:serverTimestamp() });
+            window.selComp(selectedCompanyData.id);
+        }
     </script>
 </body>
 </html>
